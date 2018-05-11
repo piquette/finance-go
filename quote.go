@@ -16,8 +16,8 @@ const (
 	QuoteTypeIndex QuoteType = "INDEX"
 	// QuoteTypeOption the returned quote should be an option contract.
 	QuoteTypeOption QuoteType = "OPTION"
-	// QuoteTypeCurrencyPair the returned quote should be a currency pair.
-	QuoteTypeCurrencyPair QuoteType = "CURRENCY"
+	// QuoteTypeForexPair the returned quote should be a forex pair.
+	QuoteTypeForexPair QuoteType = "CURRENCY"
 	// QuoteTypeFuture the returned quote should be a futures contract.
 	QuoteTypeFuture QuoteType = "FUTURE"
 	// QuoteTypeETF the returned quote should be an etf.
