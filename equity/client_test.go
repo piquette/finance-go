@@ -4,22 +4,14 @@ import (
 	"testing"
 
 	finance "github.com/piquette/finance-go"
-	_ "github.com/piquette/finance-go/testing"
-	assert "github.com/stretchr/testify/require"
+	tests "github.com/piquette/finance-go/testing"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestQuoteGet(t *testing.T) {
-	p := &finance.QuoteParams{
-		Symbol: "AAPL",
-	}
-	q, err := Get(p)
+func TestGet(t *testing.T) {
+	tests.SetMarket(finance.MarketStateRegular)
 
+	q, err := Get(tests.TestEquitySymbol)
 	assert.Nil(t, err)
 	assert.NotNil(t, q)
-}
-
-func TestQuoteGetNil(t *testing.T) {
-	q, err := Get(nil)
-	assert.Nil(t, q)
-	assert.NotNil(t, err)
 }

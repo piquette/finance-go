@@ -1,6 +1,6 @@
 # finance-go
 
-[![GoDoc](http://img.shields.io/badge/godoc-reference-blue.svg)](http://godoc.org/github.com/piquette/finance-go)
+[![GoDoc](http://img.shields.io/badge/godoc-reference-blue.svg)](http://godoc.org/github.com/piquette/finance-go) [![Build Status](https://travis-ci.org/piquette/finance-go.svg?branch=master)](https://travis-ci.org/piquette/finance-go) [![Coverage Status](https://coveralls.io/repos/github/piquette/finance-go/badge.svg?branch=master)](https://coveralls.io/github/piquette/finance-go?branch=master)
 
 ## Summary
 
@@ -12,18 +12,18 @@ Accomplishing this goal across several data sources (yfin, morningstar, FRED) et
 
 ### Planned v1.0 features
 
-Description | Source
---- | ---
-Equity quote(s) | Yahoo finance
-Index quotes(s) | Yahoo finance
-Option quotes(s) | Yahoo finance
-Forex pair quotes(s) | Yahoo finance
-Futures quotes(s) | Yahoo finance
-ETF quotes(s) | Yahoo finance
-Mutual fund quotes(s) | Yahoo finance
-Historical quotes | Yahoo finance
-Options chains | Yahoo finance
-Symbols list | BATS
+Status | Description | Source
+--- | --- | ---
+[x] | Equity quote(s) | Yahoo finance
+[ ] | Index quote(s) | Yahoo finance
+[ ] | Option quote(s) | Yahoo finance
+[ ] | Forex pair quote(s) | Yahoo finance
+[ ] | Futures quote(s) | Yahoo finance
+[ ] | ETF quote(s) | Yahoo finance
+[ ] | Mutual fund quote(s) | Yahoo finance
+[ ] | Historical quotes | Yahoo finance
+[ ] | Options chains | Yahoo finance
+[ ] | Symbols list | BATS
 
 ## Planned v1.0 documentation
 
@@ -37,14 +37,29 @@ For details on all the functionality in this library, see the [GoDoc][godoc] doc
 go get github.com/piquette/finance-go
 ```
 
+## Usage
+
+Library usage is meant to be very specific about the user's intentions.
+
+```go
+quote, err := equity.Get("AAPL")
+if err != nil {
+  // Uh-oh.  
+  panic(err)
+}
+
+// Success!
+fmt.Println(quote)
+```
+
+
 ## Development
 
 Pull requests from the community are welcome. If you submit one, please keep
 the following guidelines in mind:
 
-1. Code must be `go fmt` compliant.
-2. All types, structs and funcs should be documented.
-3. Ensure that `make test` succeeds.
+1. All types, structs and funcs should be documented.
+2. Ensure that `make test` succeeds.
 
 ## Test
 
@@ -52,7 +67,19 @@ The test suite needs testify's `require` package to run:
 
     github.com/stretchr/testify/require
 
-It also depends on a running instance of a test server [finance-mock], so make sure to fetch that project and run the application from another terminal session ([finance-mock's README][finance-mock] contains more information):
+It also depends on a running instance of a test server [finance-mock], so make sure to fetch that project and run the application from another terminal session ([finance-mock's README][finance-mock] contains more information).
+
+### Docker
+```sh
+  docker run -p 12111:12111 piquette/finance-mock:latest
+```
+### Brew
+
+    brew tap piquette/finance-mock
+    brew install finance-mock
+    finance-mock
+
+### Go
 
     go get -u github.com/piquette/finance-mock
     finance-mock
@@ -67,7 +94,7 @@ Run tests for one package:
 
 Run a single test:
 
-    go test ./equity -run TestQuoteGet
+    go test ./equity -run TestGet
 
 For any requests, bug or comments, please [open an issue][issues] or [submit a
 pull request][pulls]. Also please email or tweet me as needed.

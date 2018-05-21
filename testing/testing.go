@@ -3,6 +3,7 @@ package testing
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -13,7 +14,6 @@ import (
 
 // This file should contain any testing helpers that should be commonly
 // available across all tests in the finance package.
-
 const (
 	// MockMinimumVersion is the minimum acceptable version for finance-mock.
 	// It's here so that if the library depends on new endpoints or features
@@ -21,6 +21,16 @@ const (
 	// better error message instead of the test suite crashing with a bunch of
 	// confusing 404 errors or the like.
 	MockMinimumVersion = "0.0.1"
+	TestServerAddr     = "localhost"
+
+	// Symbols for testing asset classes.
+	TestEquitySymbol    = "AAPL"
+	TestETFSymbol       = "SPY"
+	TestFutureSymbol    = "O=F"
+	TestIndexSymbol     = "^GSPC"
+	TestOptionSymbol    = "NYT180518C00016000"
+	TestMutualFundymbol = "INPSX"
+	TestForexSymbol     = "USDGBP=X"
 )
 
 func init() {
@@ -33,10 +43,10 @@ func init() {
 		port = "12111"
 	}
 
-	resp, err := http.Get("http://localhost:" + port)
+	resp, err := http.Get("http://" + TestServerAddr + ":" + port)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't reach finance-mock at `localhost:%s`. Is "+
-			"it running? Please see README for setup instructions.\n", port)
+		fmt.Fprintf(os.Stderr, "Couldn't reach finance-mock at `%s:%s`. Is "+
+			"it running? Please see README for setup instructions.\n", TestServerAddr, port)
 		os.Exit(1)
 	}
 
@@ -50,9 +60,43 @@ func init() {
 
 	finance.SetBackend(finance.YFinBackend, &finance.BackendConfiguration{
 		Type:       finance.YFinBackend,
-		URL:        "http://localhost:" + port,
+		URL:        "http://" + TestServerAddr + ":" + port,
 		HTTPClient: &http.Client{},
 	})
+}
+
+// SetMarket sets the test server to the state/session specified.
+func SetMarket(state finance.MarketState) {
+	// one of regular/post/pre
+	var mktState string
+
+	switch state {
+	case finance.MarketStatePre,
+		finance.MarketStatePrePre:
+		mktState = "pre"
+	case finance.MarketStatePost,
+		finance.MarketStatePostPost:
+		mktState = "post"
+	default:
+		mktState = "regular"
+	}
+
+	form := url.Values{}
+	form.Add("state", mktState)
+
+	// Post.
+	resp, err := http.PostForm("http://localhost:12111/config/", form)
+	if err != nil || resp.StatusCode != http.StatusOK {
+
+		fmt.Println(resp.Request.Form)
+
+		fmt.Fprintf(os.Stderr, "Couldn't change state of finance-mock. Is "+
+			"it running? Please see README for setup instructions.\n")
+		os.Exit(1)
+	}
+
+	// Success.
+	fmt.Fprintf(os.Stdout, "Changed state of finance-mock to %s.\n", mktState)
 }
 
 // compareVersions compares two semantic version strings. We need this because

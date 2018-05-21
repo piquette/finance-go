@@ -1,13 +1,10 @@
-all: test vet check-gofmt
+all: test vet
 
 bench:
 	go test -race -bench . -run "Benchmark" ./form
 
 build:
 	go build ./...
-
-check-gofmt:
-	scripts/check_gofmt.sh
 
 test:
 	go test -race ./...

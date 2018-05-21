@@ -2,19 +2,19 @@ package finance
 
 import "encoding/json"
 
-// YFinResponse wraps a generic yfin api response.
-type YFinResponse struct {
-	Result []interface{} `json:"result"`
-	Error  *YFinError    `json:"error"`
+//
+// Contains all the structs / info needed to
+// consume and parse yfin apis.
+//
+
+// YfinError represents information returned in an error response.
+type YfinError struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
 }
 
-// YFinError is the response returned when a yfin call is unsuccessful.
-type YFinError struct {
-	Err *Error `json:"error"`
-}
-
-// Error serializes fields.
-func (y *YFinError) Error() string {
-	ret, _ := json.Marshal(y)
+// Error serializes the error object to JSON and returns it as a string.
+func (e *YfinError) Error() string {
+	ret, _ := json.Marshal(e)
 	return string(ret)
 }

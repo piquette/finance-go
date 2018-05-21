@@ -1,10 +1,9 @@
 package finance
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"io"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -83,7 +82,7 @@ type BackendConfiguration struct {
 // Backend is an interface for making calls against an api service.
 // This interface exists to enable mocking for during testing if needed.
 type Backend interface {
-	Call(method, path string, body *form.Values, ctx *context.Context, v interface{}) error
+	Call(path string, body *form.Values, ctx *context.Context, v interface{}) error
 }
 
 // SetHTTPClient overrides the default HTTP client.
@@ -147,18 +146,13 @@ func SetBackend(backend SupportedBackend, b Backend) {
 }
 
 // Call is the Backend.Call implementation for invoking market data APIs.
-func (s *BackendConfiguration) Call(method, path string, form *form.Values, ctx *context.Context, v interface{}) error {
-	var body io.Reader
+func (s *BackendConfiguration) Call(path string, form *form.Values, ctx *context.Context, v interface{}) error {
+
 	if form != nil && !form.Empty() {
-		data := form.Encode()
-		if strings.ToUpper(method) == "GET" {
-			path += "?" + data
-		} else {
-			body = bytes.NewBufferString(data)
-		}
+		path += "?" + form.Encode()
 	}
 
-	req, err := s.NewRequest(method, path, body, ctx)
+	req, err := s.NewRequest("GET", path, ctx)
 	if err != nil {
 		return err
 	}
@@ -171,14 +165,14 @@ func (s *BackendConfiguration) Call(method, path string, form *form.Values, ctx 
 }
 
 // NewRequest is used by Call to generate an http.Request.
-func (s *BackendConfiguration) NewRequest(method, path string, body io.Reader, ctx *context.Context) (*http.Request, error) {
+func (s *BackendConfiguration) NewRequest(method, path string, ctx *context.Context) (*http.Request, error) {
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
 
 	path = s.URL + path
 
-	req, err := http.NewRequest(method, path, body)
+	req, err := http.NewRequest(method, path, nil)
 	if err != nil {
 		if LogLevel > 0 {
 			Logger.Printf("Cannot create api request: %v\n", err)
@@ -225,7 +219,10 @@ func (s *BackendConfiguration) Do(req *http.Request, v interface{}) error {
 	}
 
 	if res.StatusCode >= 400 {
-		return s.ResponseToError(res, resBody)
+		if LogLevel > 0 {
+			Logger.Printf("API error: %q\n", resBody)
+		}
+		return errors.New("error response recieved from upstream api")
 	}
 
 	if LogLevel > 2 {
@@ -237,38 +234,4 @@ func (s *BackendConfiguration) Do(req *http.Request, v interface{}) error {
 	}
 
 	return nil
-}
-
-// ResponseToError tbd.
-func (s *BackendConfiguration) ResponseToError(res *http.Response, resBody []byte) error {
-
-	financeErr := &Error{
-		HTTPStatusCode: res.StatusCode,
-	}
-
-	if s.Type == YFinBackend {
-		yfinError := &YFinError{}
-		err := json.Unmarshal(resBody, &yfinError)
-		if err != nil {
-			return &Error{
-				Code:        ErrorCodeAPI,
-				Description: ErrorDescriptionResponse,
-				Err:         err,
-			}
-		}
-
-		yfinError.Err = financeErr
-
-		if LogLevel > 0 {
-			Logger.Printf("Error encountered from yfin api: %v\n", yfinError)
-		}
-
-		return yfinError
-
-	}
-
-	// TODO:
-	// No other backends implemented yet.
-
-	return financeErr
 }

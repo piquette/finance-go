@@ -1,26 +1,30 @@
 package equity
 
 import (
+	"context"
+	"fmt"
+	"strings"
+
 	finance "github.com/piquette/finance-go"
-	"github.com/piquette/finance-go/form"
+	form "github.com/piquette/finance-go/form"
 )
 
-// Client is used to invoke /quote APIs.
+// Client is used to invoke quote APIs.
 type Client struct {
 	B finance.Backend
 }
 
-// Response represents a quote response.
-type Response struct {
-	finance.YFinResponse `json:"quoteResponse"`
+func getC() Client {
+	return Client{finance.GetBackend(finance.YFinBackend)}
 }
 
-func (r *Response) getFirst() *finance.Quote {
-	if len(r.Result) == 0 {
-		return nil
-	}
-
-	return r.Result[0].(*finance.Quote)
+// Params carries a context and symbols information.
+type Params struct {
+	finance.Params `form:"-"`
+	// Symbols are the symbols for which a
+	// quote is requested.
+	Symbols []string `form:"-"`
+	sym     string   `form:"symbols"`
 }
 
 // Iter is an iterator for a list of quotes.
@@ -30,50 +34,77 @@ type Iter struct {
 	*finance.Iter
 }
 
-// Quote returns the most recent Quote
+// Equity returns the most recent Equity
 // visited by a call to Next.
-func (i *Iter) Quote() *finance.Quote {
-	return i.Current().(*finance.Quote)
+func (i *Iter) Equity() *finance.Equity {
+	fmt.Println(i.Current())
+	return i.Current().(*finance.Equity)
 }
 
-func getC() Client {
-	return Client{finance.GetBackend(finance.YFinBackend)}
-}
+// Get returns an equity quote that matches the parameters specified.
+func Get(symbol string) (*finance.Equity, error) {
+	i := List([]string{symbol})
 
-// Get returns a quote that matches the parameters specified.
-func Get(params *finance.QuoteParams) (*finance.Quote, error) {
-	return getC().Get(params)
-}
-
-// Get returns a quote that matches the parameters specified.
-func (c Client) Get(params *finance.QuoteParams) (*finance.Quote, error) {
-
-	if params == nil {
-		return nil, &finance.Error{
-			Code:        finance.ErrorCodeArguments,
-			Description: finance.ErrorDescriptionSymbols,
-		}
+	if !i.Next() {
+		return nil, i.Err()
 	}
 
-	//var body *form.Values
+	return i.Equity(), nil
+}
+
+// List returns several quotes.
+func List(symbols []string) *Iter {
+	return ListP(&Params{Symbols: symbols})
+}
+
+// ListP returns a quote iterator and requires a params
+// struct as an argument.
+func ListP(params *Params) *Iter {
+	return getC().ListP(params)
+}
+
+// ListP returns a quote iterator.
+func (c Client) ListP(params *Params) *Iter {
+
+	if params.Context == nil {
+		ctx := context.TODO()
+		params.Context = &ctx
+	}
+
+	// Validate input.
+	// TODO: validate symbols..
+	if params == nil || len(params.Symbols) == 0 {
+		return &Iter{finance.GetErrIter(finance.CreateArgumentError())}
+	}
+	params.sym = strings.Join(params.Symbols, ",")
+
 	body := &form.Values{}
 	form.AppendTo(body, params)
 
-	resp := &Response{}
-	err := c.B.Call("GET", "/v7/finance/quote", body, params.Context, resp)
-	if err != nil {
-		return nil, err
-	}
+	return &Iter{finance.GetIter(body, func(b *form.Values) ([]interface{}, error) {
 
-	return resp.getFirst(), resp.Error
+		resp := response{}
+		err := c.B.Call("/v7/finance/quote", body, params.Context, &resp)
+		if err != nil {
+			err = finance.CreateRemoteError(err)
+		}
+
+		ret := make([]interface{}, len(resp.Inner.Result))
+		for i, v := range resp.Inner.Result {
+			ret[i] = v
+		}
+		if resp.Inner.Error != nil {
+			err = finance.CreateRemoteError(resp.Inner.Error)
+		}
+
+		return ret, err
+	})}
 }
 
-// List returns several quotes.
-func List(params *finance.QuoteParams) *Iter {
-	return getC().List(params)
-}
-
-// List returns several quotes.
-func (c Client) List(params *finance.QuoteParams) *Iter {
-	return &Iter{}
+// response is a yfin quote response.
+type response struct {
+	Inner struct {
+		Result []*finance.Equity  `json:"result"`
+		Error  *finance.YfinError `json:"error"`
+	} `json:"quoteResponse"`
 }

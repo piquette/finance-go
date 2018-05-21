@@ -1,0 +1,50 @@
+before_install:
+  - go get -u github.com/stretchr/testify/require
+
+  # Install code coverage / coveralls tooling
+  - go get -u golang.org/x/tools/cmd/cover
+  - go get -u github.com/modocache/gover
+  - go get -u github.com/mattn/goveralls
+
+  # Unpack and start test server so that the test suite can talk to it
+  - |
+    if [ ! -d "finance-mock/finance-mock_${FINANCE_MOCK_VERSION}" ]; then
+      mkdir -p finance-mock/finance-mock_${FINANCE_MOCK_VERSION}/
+      curl -L "https://github.com/piquette/finance-mock/releases/download/v${FINANCE_MOCK_VERSION}/finance-mock_${FINANCE_MOCK_VERSION}_linux_amd64.tar.gz" -o "finance-mock/finance-mock_${FINANCE_MOCK_VERSION}_linux_amd64.tar.gz"
+      tar -zxf "finance-mock/finance-mock_${FINANCE_MOCK_VERSION}_linux_amd64.tar.gz" -C "finance-mock/finance-mock_${FINANCE_MOCK_VERSION}/"
+    fi
+  - |
+    finance-mock/finance-mock_${FINANCE_MOCK_VERSION}/finance-mock > /dev/null &
+    FINANCE_MOCK_PID=$!
+
+cache:
+  directories:
+    - finance-mock
+
+env:
+  global:
+    - FINANCE_MOCK_VERSION=0.0.1
+
+go:
+  - "1.9"
+  - "1.10"
+  - tip
+
+language: go
+
+matrix:
+  allow_failures:
+    - go: tip
+  fast_finish: true
+
+script:
+  - make
+  - make coverage
+
+after_script:
+  # Merge all coverage reports located in subdirectories and put them under: gover.coverprofile
+  - gover
+  # Send code coverage report to coveralls.io
+  - goveralls -service=travis-ci -coverprofile=gover.coverprofile
+
+sudo: false

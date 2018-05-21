@@ -39,27 +39,107 @@ const (
 	MarketStateClosed MarketState = "CLOSED"
 )
 
-// QuoteParams determines which quote to
-// retrieve and provides a context.
-type QuoteParams struct {
-	Symbol string `form:"symbols"`
+// Params used as a parameter to many api functions.
+type Params struct {
 	// Context used for request. It may carry deadlines, cancelation signals,
 	// and other request-scoped values across API boundaries and between
 	// processes.
-	//
 	// Note that a cancelled or timed out context does not provide any
 	// guarantee whether the operation was or was not completed.
 	Context *context.Context `form:"-"`
 }
 
-// Quote is the basic quote structure.
+// Equity representa a single equity quote.
+type Equity struct {
+	Quote
+	// Equity-only fields.
+	LongName                    string  `json:"longName"`
+	EpsTrailingTwelveMonths     float64 `json:"epsTrailingTwelveMonths"`
+	EpsForward                  float64 `json:"epsForward"`
+	EarningsTimestamp           int     `json:"earningsTimestamp"`
+	EarningsTimestampStart      int     `json:"earningsTimestampStart"`
+	EarningsTimestampEnd        int     `json:"earningsTimestampEnd"`
+	TrailingAnnualDividendRate  float64 `json:"trailingAnnualDividendRate"`
+	DividendDate                int     `json:"dividendDate"`
+	TrailingAnnualDividendYield float64 `json:"trailingAnnualDividendYield"`
+	TrailingPE                  float64 `json:"trailingPE"`
+	ForwardPE                   float64 `json:"forwardPE"`
+	BookValue                   float64 `json:"bookValue"`
+	PriceToBook                 float64 `json:"priceToBook"`
+	SharesOutstanding           int     `json:"sharesOutstanding"`
+	MarketCap                   int64   `json:"marketCap"`
+}
+
+// ETF representa a single etf quote.
+type ETF struct {
+	*Quote
+	// MutualFund/ETF-only fields.
+	YTDReturn                    float64 `json:"ytdReturn"`
+	TrailingThreeMonthReturns    float64 `json:"trailingThreeMonthReturns"`
+	TrailingThreeMonthNavReturns float64 `json:"trailingThreeMonthNavReturns"`
+}
+
+// MutualFund represents a single mutual fund share quote.
+type MutualFund struct {
+	*Quote
+	// MutualFund/ETF-only fields.
+	YTDReturn                    float64 `json:"ytdReturn"`
+	TrailingThreeMonthReturns    float64 `json:"trailingThreeMonthReturns"`
+	TrailingThreeMonthNavReturns float64 `json:"trailingThreeMonthNavReturns"`
+}
+
+// Index represents a single market Index quote.
+// The term `quote` here doesn't really apply in
+// a practical sense, as indicies themselves are
+// by definition not tradable assets.
+type Index struct {
+	*Quote
+}
+
+// Option represents a single option contract quote
+// for a specified strike and expiration.
+type Option struct {
+	*Quote
+	// Options/Futures-only fields.
+	UnderlyingSymbol         string  `json:"underlyingSymbol"`
+	OpenInterest             int     `json:"openInterest"`
+	ExpireDate               int     `json:"expireDate"`
+	Strike                   float64 `json:"strike"`
+	UnderlyingExchangeSymbol string  `json:"underlyingExchangeSymbol"`
+	HeadSymbolAsString       string  `json:"headSymbolAsString"`
+	IsContractSymbol         bool    `json:"contractSymbol"`
+}
+
+// Future represents a single futures contract quote
+// for a specified strike and expiration.
+type Future struct {
+	*Quote
+	// Options/Futures-only fields.
+	UnderlyingSymbol         string  `json:"underlyingSymbol"`
+	OpenInterest             int     `json:"openInterest"`
+	ExpireDate               int     `json:"expireDate"`
+	Strike                   float64 `json:"strike"`
+	UnderlyingExchangeSymbol string  `json:"underlyingExchangeSymbol"`
+	HeadSymbolAsString       string  `json:"headSymbolAsString"`
+	IsContractSymbol         bool    `json:"contractSymbol"`
+}
+
+// ForexPair represents a single forex currency pair quote.
+type ForexPair struct {
+	*Quote
+}
+
+// Quote is the basic quote structure shared across
+// asset classes.
+//
+// Contains most fields that are common across all
+// possible assets.
 type Quote struct {
 	// Quote classifying fields.
 	Symbol      string      `json:"symbol"`
 	MarketState MarketState `json:"marketState"`
 	QuoteType   QuoteType   `json:"quoteType"`
 	ShortName   string      `json:"shortName"`
-	LongName    string      `json:"longName"`
 
 	// Regular session quote data.
 	RegularMarketChangePercent float64 `json:"regularMarketChangePercent"`
@@ -122,34 +202,4 @@ type Quote struct {
 	GMTOffSetMilliseconds     int    `json:"gmtOffSetMilliseconds"`
 	MarketID                  string `json:"market"`
 	ExchangeID                string `json:"exchange"`
-
-	// Equity-only.
-	EpsTrailingTwelveMonths     float64 `json:"epsTrailingTwelveMonths"`
-	EpsForward                  float64 `json:"epsForward"`
-	EarningsTimestamp           int     `json:"earningsTimestamp"`
-	EarningsTimestampStart      int     `json:"earningsTimestampStart"`
-	EarningsTimestampEnd        int     `json:"earningsTimestampEnd"`
-	TrailingAnnualDividendRate  float64 `json:"trailingAnnualDividendRate"`
-	DividendDate                int     `json:"dividendDate"`
-	TrailingAnnualDividendYield float64 `json:"trailingAnnualDividendYield"`
-	TrailingPE                  float64 `json:"trailingPE"`
-	ForwardPE                   float64 `json:"forwardPE"`
-	BookValue                   float64 `json:"bookValue"`
-	PriceToBook                 float64 `json:"priceToBook"`
-	SharesOutstanding           int     `json:"sharesOutstanding"`
-	MarketCap                   int64   `json:"marketCap"`
-
-	// MutualFund/ETF-only.
-	YTDReturn                    float64 `json:"ytdReturn"`
-	TrailingThreeMonthReturns    float64 `json:"trailingThreeMonthReturns"`
-	TrailingThreeMonthNavReturns float64 `json:"trailingThreeMonthNavReturns"`
-
-	// Options/Futures-only.
-	UnderlyingSymbol         string  `json:"underlyingSymbol"`
-	OpenInterest             int     `json:"openInterest"`
-	ExpireDate               int     `json:"expireDate"`
-	Strike                   float64 `json:"strike"`
-	UnderlyingExchangeSymbol string  `json:"underlyingExchangeSymbol"`
-	HeadSymbolAsString       string  `json:"headSymbolAsString"`
-	IsContractSymbol         bool    `json:"contractSymbol"`
 }
