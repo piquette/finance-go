@@ -12,6 +12,8 @@ Accomplishing this goal across several data sources (yfin, morningstar, FRED) et
 
 ### Planned v1.0 features
 
+Replication of the current features of FlashBoys/go-finance.
+
 Status | Description | Source
 --- | --- | ---
 [x] | Equity quote(s) | Yahoo finance
