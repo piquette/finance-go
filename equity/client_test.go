@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetRegularMarketQuote(t *testing.T) {
+func TestGetRegularMarketEquity(t *testing.T) {
 	tests.SetMarket(finance.MarketStateRegular)
 
 	q, err := Get(tests.TestEquitySymbol)
@@ -19,7 +19,7 @@ func TestGetRegularMarketQuote(t *testing.T) {
 	assert.Equal(t, tests.TestEquitySymbol, q.Symbol)
 }
 
-func TestGetPostMarketQuote(t *testing.T) {
+func TestGetPostMarketEquity(t *testing.T) {
 	tests.SetMarket(finance.MarketStatePost)
 
 	q, err := Get(tests.TestEquitySymbol)
@@ -30,7 +30,7 @@ func TestGetPostMarketQuote(t *testing.T) {
 	assert.Equal(t, tests.TestEquitySymbol, q.Symbol)
 }
 
-func TestGetPreMarketQuote(t *testing.T) {
+func TestGetPreMarketEquity(t *testing.T) {
 	tests.SetMarket(finance.MarketStatePre)
 
 	q, err := Get(tests.TestEquitySymbol)
@@ -39,10 +39,9 @@ func TestGetPreMarketQuote(t *testing.T) {
 	assert.NotNil(t, q)
 	assert.Equal(t, finance.MarketStatePre, q.MarketState)
 	assert.Equal(t, tests.TestEquitySymbol, q.Symbol)
-
 }
 
-func TestNilParamsQuote(t *testing.T) {
+func TestNilParamsEquity(t *testing.T) {
 
 	iter := List(nil)
 
@@ -50,7 +49,7 @@ func TestNilParamsQuote(t *testing.T) {
 	assert.Equal(t, "code: api-error, detail: missing function argument", iter.Err().Error())
 }
 
-func TestGetBadQuote(t *testing.T) {
+func TestGetBadEquity(t *testing.T) {
 	tests.SetMarket(finance.MarketStateRegular)
 
 	q, err := Get("TEST")

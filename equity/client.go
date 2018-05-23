@@ -2,7 +2,6 @@ package equity
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	finance "github.com/piquette/finance-go"
@@ -37,7 +36,6 @@ type Iter struct {
 // Equity returns the most recent Equity
 // visited by a call to Next.
 func (i *Iter) Equity() *finance.Equity {
-	fmt.Println(i.Current())
 	return i.Current().(*finance.Equity)
 }
 
