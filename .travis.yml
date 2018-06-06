@@ -1,6 +1,4 @@
 before_install:
-  - go get -u github.com/stretchr/testify/require
-
   # Install code coverage / coveralls tooling
   - go get -u golang.org/x/tools/cmd/cover
   - go get -u github.com/modocache/gover
@@ -23,7 +21,7 @@ cache:
 
 env:
   global:
-    - FINANCE_MOCK_VERSION=0.0.2
+    - FINANCE_MOCK_VERSION=0.0.3
 
 go:
   - "1.9"

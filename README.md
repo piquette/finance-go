@@ -18,12 +18,12 @@ Status | Description | Source
 --- | --- | ---
 [x] | Equity quote(s) | Yahoo finance
 [x] | Index quote(s) | Yahoo finance
-[ ] | Option quote(s) | Yahoo finance
+[x] | Option quote(s) | Yahoo finance
 [x] | Forex pair quote(s) | Yahoo finance
-[ ] | Futures quote(s) | Yahoo finance
+[x] | Futures quote(s) | Yahoo finance
 [x] | ETF quote(s) | Yahoo finance
 [x] | Mutual fund quote(s) | Yahoo finance
-[ ] | Historical quotes | Yahoo finance
+[x] | Historical quotes | Yahoo finance
 [ ] | Options chains | Yahoo finance
 [ ] | Symbols list | BATS
 
@@ -39,10 +39,11 @@ For details on all the functionality in this library, see the [GoDoc][godoc] doc
 go get github.com/piquette/finance-go
 ```
 
-## Usage
+## Usage examples
 
 Library usage is meant to be very specific about the user's intentions.
 
+### Quote
 ```go
 quote, err := equity.Get("AAPL")
 if err != nil {
@@ -54,6 +55,21 @@ if err != nil {
 fmt.Println(quote)
 ```
 
+### Historical data
+```go
+params := &history.Params{
+  Symbol:   "TWTR",
+  Interval: history.OneHour,
+}
+chart := history.Get(params)
+
+for chart.Next() {
+  fmt.Println(chart.Bar())
+}
+if err := chart.Err(); err != nil {
+  fmt.Println(err)
+}
+```
 
 ## Development
 

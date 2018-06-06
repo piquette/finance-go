@@ -3,6 +3,8 @@ package finance
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/shopspring/decimal"
 )
 
 //
@@ -222,4 +224,68 @@ type Quote struct {
 	GMTOffSetMilliseconds     int    `json:"gmtOffSetMilliseconds"`
 	MarketID                  string `json:"market"`
 	ExchangeID                string `json:"exchange"`
+}
+
+// ChartBar is a single instance of a chart bar.
+type ChartBar struct {
+	Open      decimal.Decimal
+	Low       decimal.Decimal
+	High      decimal.Decimal
+	Close     decimal.Decimal
+	AdjClose  decimal.Decimal
+	Volume    int
+	Timestamp int
+}
+
+// ChartResponse is a historical chart response.
+type ChartResponse struct {
+	Meta       ChartMeta `json:"meta"`
+	Timestamp  []int     `json:"timestamp"`
+	Indicators *struct {
+		Quote []*struct {
+			Open   []float64 `json:"open"`
+			Low    []float64 `json:"low"`
+			High   []float64 `json:"high"`
+			Close  []float64 `json:"close"`
+			Volume []int     `json:"volume"`
+		} `json:"quote"`
+		Adjclose []*struct {
+			Adjclose []float64 `json:"adjclose"`
+		} `json:"adjclose"`
+	} `json:"indicators"`
+}
+
+// ChartMeta is meta data associated with a chart response.
+type ChartMeta struct {
+	Currency             string    `json:"currency"`
+	Symbol               string    `json:"symbol"`
+	ExchangeName         string    `json:"exchangeName"`
+	QuoteType            QuoteType `json:"instrumentType"`
+	FirstTradeDate       int       `json:"firstTradeDate"`
+	Gmtoffset            int       `json:"gmtoffset"`
+	Timezone             string    `json:"timezone"`
+	ExchangeTimezoneName string    `json:"exchangeTimezoneName"`
+	ChartPreviousClose   float64   `json:"chartPreviousClose"`
+	CurrentTradingPeriod struct {
+		Pre struct {
+			Timezone  string `json:"timezone"`
+			Start     int    `json:"start"`
+			End       int    `json:"end"`
+			Gmtoffset int    `json:"gmtoffset"`
+		} `json:"pre"`
+		Regular struct {
+			Timezone  string `json:"timezone"`
+			Start     int    `json:"start"`
+			End       int    `json:"end"`
+			Gmtoffset int    `json:"gmtoffset"`
+		} `json:"regular"`
+		Post struct {
+			Timezone  string `json:"timezone"`
+			Start     int    `json:"start"`
+			End       int    `json:"end"`
+			Gmtoffset int    `json:"gmtoffset"`
+		} `json:"post"`
+	} `json:"currentTradingPeriod"`
+	DataGranularity string   `json:"dataGranularity"`
+	ValidRanges     []string `json:"validRanges"`
 }

@@ -3,7 +3,6 @@ package finance
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -49,7 +48,7 @@ var (
 	// 1: errors only
 	// 2: errors + informational (default)
 	// 3: errors + informational + debug
-	LogLevel = 2
+	LogLevel = 0
 
 	// Logger controls how this library performs logging at a package level. It is useful
 	// to customise if you need it prefixed for your application to meet other
@@ -222,7 +221,7 @@ func (s *BackendConfiguration) Do(req *http.Request, v interface{}) error {
 		if LogLevel > 0 {
 			Logger.Printf("API error: %q\n", resBody)
 		}
-		return errors.New("error response recieved from upstream api")
+		return CreateRemoteErrorS("error response recieved from upstream api")
 	}
 
 	if LogLevel > 2 {
