@@ -40,6 +40,8 @@ const (
 	QuoteTypeOption QuoteType = "OPTION"
 	// QuoteTypeForexPair the returned quote should be a forex pair.
 	QuoteTypeForexPair QuoteType = "CURRENCY"
+	// QuoteTypeCryptoPair the returned quote should be a crypto pair.
+	QuoteTypeCryptoPair QuoteType = "CRYPTOCURRENCY"
 	// QuoteTypeFuture the returned quote should be a futures contract.
 	QuoteTypeFuture QuoteType = "FUTURE"
 	// QuoteTypeETF the returned quote should be an etf.
@@ -149,6 +151,18 @@ type Future struct {
 // ForexPair represents a single forex currency pair quote.
 type ForexPair struct {
 	Quote
+}
+
+// CryptoPair represents a single crypto currency pair quote.
+type CryptoPair struct {
+	Quote
+	// Cryptocurrency-only fields.
+	Algorithm           string `json:"algorithm"`
+	StartDate           int    `json:"startDate"`
+	MaxSupply           int    `json:"maxSupply"`
+	CirculatingSupply   int    `json:"circulatingSupply"`
+	VolumeLastDay       int    `json:"volume24Hr"`
+	VolumeAllCurrencies int    `json:"volumeAllCurrencies"`
 }
 
 // Quote is the basic quote structure shared across
