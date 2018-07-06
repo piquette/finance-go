@@ -20,7 +20,7 @@ const (
 	// added in a more recent version of finance-mock, we can show people a
 	// better error message instead of the test suite crashing with a bunch of
 	// confusing 404 errors or the like.
-	MockMinimumVersion = "0.0.2"
+	MockMinimumVersion = "0.0.4"
 	TestServerAddr     = "localhost"
 
 	// Symbols for testing asset classes.
@@ -31,6 +31,7 @@ const (
 	TestOptionSymbol     = "NYT180518C00016000"
 	TestMutualFundSymbol = "INPSX"
 	TestForexPairSymbol  = "USDGBP=X"
+	TestCryptoPairSymbol = "BTC-USD"
 )
 
 func init() {

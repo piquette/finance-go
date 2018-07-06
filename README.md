@@ -16,10 +16,12 @@ Replication of the current features of FlashBoys/go-finance.
 
 Status | Description | Source
 --- | --- | ---
+[x] | Quote(s) | Yahoo finance
 [x] | Equity quote(s) | Yahoo finance
 [x] | Index quote(s) | Yahoo finance
 [x] | Option quote(s) | Yahoo finance
 [x] | Forex pair quote(s) | Yahoo finance
+[x] | Cryptocurrency pair quote(s) | Yahoo finance
 [x] | Futures quote(s) | Yahoo finance
 [x] | ETF quote(s) | Yahoo finance
 [x] | Mutual fund quote(s) | Yahoo finance

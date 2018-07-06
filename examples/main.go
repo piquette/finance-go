@@ -4,11 +4,21 @@ import (
 	"fmt"
 
 	"github.com/piquette/finance-go/history"
+	"github.com/piquette/finance-go/quote"
 )
 
 // This file lists several usage examples of this library
 // and can be used to verify behavior.
 func main() {
+
+	// Basic quote example.
+	// --------------------
+	q, err := quote.Get("SPY")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(q)
+	}
 
 	// Basic chart example.
 	// --------------------
@@ -23,8 +33,8 @@ func main() {
 		fmt.Println(history.NewDatetimeU(b.Timestamp))
 
 	}
-	if err := chart.Err(); err != nil {
-		fmt.Println(err)
+	if chart.Err() != nil {
+		fmt.Println(chart.Err())
 	}
 
 }
