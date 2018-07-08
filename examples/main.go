@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/piquette/finance-go/chart"
+	"github.com/piquette/finance-go/datetime"
 	"github.com/piquette/finance-go/quote"
 )
 
@@ -24,13 +25,13 @@ func main() {
 	// --------------------
 	params := &chart.Params{
 		Symbol:   "TWTR",
-		Interval: chart.OneHour,
+		Interval: datetime.OneHour,
 	}
 	iter := chart.Get(params)
 
 	for iter.Next() {
 		b := iter.Bar()
-		fmt.Println(chart.NewDatetimeU(b.Timestamp))
+		fmt.Println(datetime.FromUnix(b.Timestamp))
 
 	}
 	if iter.Err() != nil {

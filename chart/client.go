@@ -4,6 +4,7 @@ import (
 	"context"
 
 	finance "github.com/piquette/finance-go"
+	"github.com/piquette/finance-go/datetime"
 	form "github.com/piquette/finance-go/form"
 	"github.com/shopspring/decimal"
 )
@@ -23,10 +24,10 @@ type Params struct {
 	finance.Params `form:"-"`
 
 	// Accessible fields.
-	Symbol   string    `form:"-"`
-	Start    *Datetime `form:"-"`
-	End      *Datetime `form:"-"`
-	Interval Interval  `form:"-"`
+	Symbol   string             `form:"-"`
+	Start    *datetime.Datetime `form:"-"`
+	End      *datetime.Datetime `form:"-"`
+	Interval datetime.Interval  `form:"-"`
 
 	IncludeExt bool `form:"includePrePost"`
 
@@ -34,8 +35,6 @@ type Params struct {
 	interval string `form:"interval"`
 	start    int    `form:"period1"`
 	end      int    `form:"period2"`
-	region   string `form:"region"`
-	domain   string `form:"corsDomain"`
 }
 
 // Iter is a structure containing results
@@ -67,25 +66,25 @@ func Get(params *Params) *Iter {
 // Get returns a historical chart.
 func (c Client) Get(params *Params) *Iter {
 
-	if params.Context == nil {
-		ctx := context.TODO()
-		params.Context = &ctx
-	}
-
 	// Construct request from params input.
 	// TODO: validate symbol..
 	if params == nil || len(params.Symbol) == 0 {
 		return &Iter{finance.GetErrIter(finance.CreateArgumentError())}
 	}
 
-	// Start and End times.
+	if params.Context == nil {
+		ctx := context.TODO()
+		params.Context = &ctx
+	}
+
+	// Start and End times
 	params.start = -1
 	params.end = -1
 	if params.Start != nil {
-		params.start = params.Start.ToUnix()
+		params.start = params.Start.Unix()
 	}
 	if params.End != nil {
-		params.end = params.End.ToUnix()
+		params.end = params.End.Unix()
 	}
 	if params.start > params.end {
 		return &Iter{finance.GetErrIter(finance.CreateChartTimeError())}
@@ -96,12 +95,12 @@ func (c Client) Get(params *Params) *Iter {
 		params.interval = string(params.Interval)
 	}
 
-	// Set meta data.
-	params.domain = "com.finance.yahoo"
-	params.region = "US"
-
+	// Build request.
 	body := &form.Values{}
 	form.AppendTo(body, params)
+	// Set request meta data.
+	body.Set("region", "US")
+	body.Set("corsDomain", "com.finance.yahoo")
 
 	return &Iter{finance.GetChartIter(body, func(b *form.Values) (m interface{}, bars []interface{}, err error) {
 

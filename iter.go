@@ -14,8 +14,7 @@ type ChartQuery func(*form.Values) (interface{}, []interface{}, error)
 // for iterating over the elements
 // returned from paginated list API calls.
 // Successive calls to the Next method
-// will step through each item in the list,
-// fetching pages of items as needed.
+// will step through each item in the list.
 // Iterators are not thread-safe, so they should not be consumed
 // across multiple goroutines.
 type Iter struct {

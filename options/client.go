@@ -1,6 +1,10 @@
 package options
 
-import finance "github.com/piquette/finance-go"
+import (
+	"context"
+
+	finance "github.com/piquette/finance-go"
+)
 
 // Client is used to invoke options APIs.
 type Client struct {
@@ -10,6 +14,13 @@ type Client struct {
 func getC() Client {
 	return Client{finance.GetBackend(finance.YFinBackend)}
 }
+
+type format int
+
+const (
+	optionchain format = iota
+	optionstraddle
+)
 
 // Params carries a context and chart information.
 type Params struct {
@@ -21,11 +32,43 @@ type Params struct {
 	//Start  *Datetime `form:"-"`
 }
 
-// Iter is a structure containing results
+// StraddleIter is a structure containing results
 // and related metadata for a
-// yfin options request.
-type Iter struct {
+// yfin option straddles request.
+type StraddleIter struct {
 	*finance.Iter
+}
+
+// GetStraddle returns options straddles.
+// and requires a underlier symbol as an argument.
+func GetStraddle(underlier string) *StraddleIter {
+	return GetStraddleP(&Params{Underlier: underlier})
+}
+
+// GetStraddleP returns options straddles.
+// and requires a params struct as an argument.
+func GetStraddleP(params *Params) *StraddleIter {
+	return getC().GetStraddleP(params)
+}
+
+// GetStraddleP returns options straddles.
+// and requires a params struct as an argument.
+func (c Client) GetStraddleP(params *Params) *StraddleIter {
+
+	// Construct request from params input.
+	// TODO: validate symbol..
+	if params == nil || len(params.Underlier) == 0 {
+		return &StraddleIter{finance.GetErrIter(finance.CreateArgumentError())}
+	}
+
+	if params.Context == nil {
+		ctx := context.TODO()
+		params.Context = &ctx
+	}
+
+	// ---
+
+	return nil
 }
 
 // response is a yfin option response.
