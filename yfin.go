@@ -251,24 +251,6 @@ type ChartBar struct {
 	Timestamp int
 }
 
-// ChartResponse is a historical chart response.
-type ChartResponse struct {
-	Meta       ChartMeta `json:"meta"`
-	Timestamp  []int     `json:"timestamp"`
-	Indicators *struct {
-		Quote []*struct {
-			Open   []float64 `json:"open"`
-			Low    []float64 `json:"low"`
-			High   []float64 `json:"high"`
-			Close  []float64 `json:"close"`
-			Volume []int     `json:"volume"`
-		} `json:"quote"`
-		Adjclose []*struct {
-			Adjclose []float64 `json:"adjclose"`
-		} `json:"adjclose"`
-	} `json:"indicators"`
-}
-
 // ChartMeta is meta data associated with a chart response.
 type ChartMeta struct {
 	Currency             string    `json:"currency"`
@@ -302,4 +284,30 @@ type ChartMeta struct {
 	} `json:"currentTradingPeriod"`
 	DataGranularity string   `json:"dataGranularity"`
 	ValidRanges     []string `json:"validRanges"`
+}
+
+// Straddle is a put/call straddle for a particular strike.
+type Straddle struct {
+	Strike float64   `json:"strike"`
+	Call   *Contract `json:"call,omitempty"`
+	Put    *Contract `json:"put,omitempty"`
+}
+
+// Contract is a struct containing a single option contract, usually part of a chain.
+type Contract struct {
+	Symbol            string  `json:"contractSymbol"`
+	Strike            float64 `json:"strike"`
+	Currency          string  `json:"currency"`
+	LastPrice         float64 `json:"lastPrice"`
+	Change            float64 `json:"change"`
+	PercentChange     float64 `json:"percentChange"`
+	Volume            int     `json:"volume"`
+	OpenInterest      int     `json:"openInterest"`
+	Bid               float64 `json:"bid"`
+	Ask               float64 `json:"ask"`
+	Size              string  `json:"contractSize"`
+	Expiration        int     `json:"expiration"`
+	LastTradeDate     int     `json:"lastTradeDate"`
+	ImpliedVolatility float64 `json:"impliedVolatility"`
+	InTheMoney        bool    `json:"inTheMoney"`
 }

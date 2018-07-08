@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/piquette/finance-go/history"
+	"github.com/piquette/finance-go/chart"
 	"github.com/piquette/finance-go/quote"
 )
 
@@ -22,19 +22,18 @@ func main() {
 
 	// Basic chart example.
 	// --------------------
-	params := &history.Params{
+	params := &chart.Params{
 		Symbol:   "TWTR",
-		Interval: history.OneHour,
+		Interval: chart.OneHour,
 	}
-	chart := history.Get(params)
+	iter := chart.Get(params)
 
-	for chart.Next() {
-		b := chart.Bar()
-		fmt.Println(history.NewDatetimeU(b.Timestamp))
+	for iter.Next() {
+		b := iter.Bar()
+		fmt.Println(chart.NewDatetimeU(b.Timestamp))
 
 	}
-	if chart.Err() != nil {
-		fmt.Println(chart.Err())
+	if iter.Err() != nil {
+		fmt.Println(iter.Err())
 	}
-
 }

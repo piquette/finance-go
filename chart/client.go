@@ -1,4 +1,4 @@
-package history
+package chart
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// Client is used to invoke quote APIs.
+// Client is used to invoke chart APIs.
 type Client struct {
 	B finance.Backend
 }
@@ -38,34 +38,34 @@ type Params struct {
 	domain   string `form:"corsDomain"`
 }
 
-// Chart is a structure containing results
+// Iter is a structure containing results
 // and related metadata for a
 // yfin chart request.
-type Chart struct {
+type Iter struct {
 	*finance.Iter
 }
 
 // Bar returns the next Bar
 // visited by a call to Next.
-func (ch *Chart) Bar() *finance.ChartBar {
-	return ch.Current().(*finance.ChartBar)
+func (i *Iter) Bar() *finance.ChartBar {
+	return i.Current().(*finance.ChartBar)
 }
 
 // Meta returns the chart metadata
 // related to a chart response.
-func (ch *Chart) Meta() *finance.ChartMeta {
-	return ch.Meta()
+func (i *Iter) Meta() *finance.ChartMeta {
+	return i.Iter.Meta().(*finance.ChartMeta)
 }
 
 // Get returns a historical chart.
 // and requires a params
 // struct as an argument.
-func Get(params *Params) *Chart {
+func Get(params *Params) *Iter {
 	return getC().Get(params)
 }
 
 // Get returns a historical chart.
-func (c Client) Get(params *Params) *Chart {
+func (c Client) Get(params *Params) *Iter {
 
 	if params.Context == nil {
 		ctx := context.TODO()
@@ -75,7 +75,7 @@ func (c Client) Get(params *Params) *Chart {
 	// Construct request from params input.
 	// TODO: validate symbol..
 	if params == nil || len(params.Symbol) == 0 {
-		return &Chart{finance.GetErrIter(finance.CreateArgumentError())}
+		return &Iter{finance.GetErrIter(finance.CreateArgumentError())}
 	}
 
 	// Start and End times.
@@ -88,7 +88,7 @@ func (c Client) Get(params *Params) *Chart {
 		params.end = params.End.ToUnix()
 	}
 	if params.start > params.end {
-		return &Chart{finance.GetErrIter(finance.CreateChartTimeError())}
+		return &Iter{finance.GetErrIter(finance.CreateChartTimeError())}
 	}
 
 	// Parse interval.
@@ -103,7 +103,7 @@ func (c Client) Get(params *Params) *Chart {
 	body := &form.Values{}
 	form.AppendTo(body, params)
 
-	return &Chart{finance.GetChartIter(body, func(b *form.Values) (m interface{}, bars []interface{}, err error) {
+	return &Iter{finance.GetChartIter(body, func(b *form.Values) (m interface{}, bars []interface{}, err error) {
 
 		resp := response{}
 		err = c.B.Call("v8/finance/chart/"+params.Symbol, body, params.Context, &resp)
@@ -116,22 +116,22 @@ func (c Client) Get(params *Params) *Chart {
 			return
 		}
 
-		chartResp := resp.Inner.Result[0]
-		if chartResp == nil || chartResp.Indicators == nil {
+		result := resp.Inner.Results[0]
+		if result == nil || result.Indicators == nil {
 			err = finance.CreateRemoteErrorS("no results in chart response")
 			return
 		}
 
-		barQuotes := chartResp.Indicators.Quote
+		barQuotes := result.Indicators.Quote
 		if barQuotes == nil || barQuotes[0] == nil {
 			err = finance.CreateRemoteErrorS("no results in chart response")
 			return
 		}
-		adjCloses := chartResp.Indicators.Adjclose
+		adjCloses := result.Indicators.Adjclose
 
 		// Process chart response
 		// and chart meta data.
-		for i, t := range chartResp.Timestamp {
+		for i, t := range result.Timestamp {
 
 			b := &finance.ChartBar{
 				Timestamp: t,
@@ -149,14 +149,32 @@ func (c Client) Get(params *Params) *Chart {
 			bars = append(bars, b)
 		}
 
-		return chartResp.Meta, bars, nil
+		return result.Meta, bars, nil
 	})}
 }
 
 // response is a yfin chart response.
 type response struct {
 	Inner struct {
-		Result []*finance.ChartResponse `json:"result"`
-		Error  *finance.YfinError       `json:"error"`
+		Results []*result          `json:"result"`
+		Error   *finance.YfinError `json:"error"`
 	} `json:"chart"`
+}
+
+// result is an umbrella object for chart results.
+type result struct {
+	Meta       finance.ChartMeta `json:"meta"`
+	Timestamp  []int             `json:"timestamp"`
+	Indicators *struct {
+		Quote []*struct {
+			Open   []float64 `json:"open"`
+			Low    []float64 `json:"low"`
+			High   []float64 `json:"high"`
+			Close  []float64 `json:"close"`
+			Volume []int     `json:"volume"`
+		} `json:"quote"`
+		Adjclose []*struct {
+			Adjclose []float64 `json:"adjclose"`
+		} `json:"adjclose"`
+	} `json:"indicators"`
 }
