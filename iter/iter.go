@@ -1,14 +1,11 @@
-package finance
+package iter
 
 import (
 	"github.com/piquette/finance-go/form"
 )
 
-// QuoteQuery is the function used to get a quote listing.
-type QuoteQuery func(*form.Values) ([]interface{}, error)
-
-// ChartQuery is the function used to get a chart listing.
-type ChartQuery func(*form.Values) (interface{}, []interface{}, error)
+// Query is the function used to get a response listing.
+type Query = func(*form.Values) (interface{}, []interface{}, error)
 
 // Iter provides a convenient interface
 // for iterating over the elements
@@ -24,28 +21,15 @@ type Iter struct {
 	values []interface{}
 }
 
-// GetIter returns a new Iter for a given quote query and its options.
-func GetIter(qs *form.Values, query QuoteQuery) *Iter {
-	iter := &Iter{}
-
-	q := qs
-	if q == nil {
-		q = &form.Values{}
-	}
-
-	iter.values, iter.err = query(q)
-	return iter
-}
-
-// GetErrIter returns a iter wrapping an error.
-func GetErrIter(e error) *Iter {
+// NewE returns a iter wrapping an error.
+func NewE(e error) *Iter {
 	iter := &Iter{}
 	iter.err = e
 	return iter
 }
 
-// GetChartIter returns a new Iter for a given chart query and its options.
-func GetChartIter(qs *form.Values, query ChartQuery) *Iter {
+// New returns a new instance of Iter for a given query and its options.
+func New(qs *form.Values, query Query) *Iter {
 	iter := &Iter{}
 
 	q := qs

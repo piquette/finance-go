@@ -45,7 +45,7 @@ func init() {
 	}
 
 	resp, err := http.Get("http://" + TestServerAddr + ":" + port)
-	if err != nil {
+	if err != nil || resp.StatusCode != http.StatusOK {
 		fmt.Fprintf(os.Stderr, "Couldn't reach finance-mock at `%s:%s`. Is "+
 			"it running? Please see README for setup instructions.\n", TestServerAddr, port)
 		os.Exit(1)

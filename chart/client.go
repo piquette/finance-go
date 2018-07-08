@@ -6,6 +6,7 @@ import (
 	finance "github.com/piquette/finance-go"
 	"github.com/piquette/finance-go/datetime"
 	form "github.com/piquette/finance-go/form"
+	"github.com/piquette/finance-go/iter"
 	"github.com/shopspring/decimal"
 )
 
@@ -41,7 +42,7 @@ type Params struct {
 // and related metadata for a
 // yfin chart request.
 type Iter struct {
-	*finance.Iter
+	*iter.Iter
 }
 
 // Bar returns the next Bar
@@ -69,7 +70,7 @@ func (c Client) Get(params *Params) *Iter {
 	// Construct request from params input.
 	// TODO: validate symbol..
 	if params == nil || len(params.Symbol) == 0 {
-		return &Iter{finance.GetErrIter(finance.CreateArgumentError())}
+		return &Iter{iter.NewE(finance.CreateArgumentError())}
 	}
 
 	if params.Context == nil {
@@ -87,7 +88,7 @@ func (c Client) Get(params *Params) *Iter {
 		params.end = params.End.Unix()
 	}
 	if params.start > params.end {
-		return &Iter{finance.GetErrIter(finance.CreateChartTimeError())}
+		return &Iter{iter.NewE(finance.CreateChartTimeError())}
 	}
 
 	// Parse interval.
@@ -102,7 +103,7 @@ func (c Client) Get(params *Params) *Iter {
 	body.Set("region", "US")
 	body.Set("corsDomain", "com.finance.yahoo")
 
-	return &Iter{finance.GetChartIter(body, func(b *form.Values) (m interface{}, bars []interface{}, err error) {
+	return &Iter{iter.New(body, func(b *form.Values) (m interface{}, bars []interface{}, err error) {
 
 		resp := response{}
 		err = c.B.Call("v8/finance/chart/"+params.Symbol, body, params.Context, &resp)

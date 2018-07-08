@@ -4,6 +4,7 @@ import (
 	"context"
 
 	finance "github.com/piquette/finance-go"
+	"github.com/piquette/finance-go/iter"
 )
 
 // Client is used to invoke options APIs.
@@ -36,7 +37,7 @@ type Params struct {
 // and related metadata for a
 // yfin option straddles request.
 type StraddleIter struct {
-	*finance.Iter
+	*iter.Iter
 }
 
 // GetStraddle returns options straddles.
@@ -58,7 +59,7 @@ func (c Client) GetStraddleP(params *Params) *StraddleIter {
 	// Construct request from params input.
 	// TODO: validate symbol..
 	if params == nil || len(params.Underlier) == 0 {
-		return &StraddleIter{finance.GetErrIter(finance.CreateArgumentError())}
+		return &StraddleIter{iter.NewE(finance.CreateArgumentError())}
 	}
 
 	if params.Context == nil {

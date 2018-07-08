@@ -6,6 +6,7 @@ import (
 
 	finance "github.com/piquette/finance-go"
 	form "github.com/piquette/finance-go/form"
+	"github.com/piquette/finance-go/iter"
 )
 
 // Client is used to invoke quote APIs.
@@ -30,7 +31,7 @@ type Params struct {
 // The embedded Iter carries methods with it;
 // see its documentation for details.
 type Iter struct {
-	*finance.Iter
+	*iter.Iter
 }
 
 // ForexPair returns the most recent ForexPair
@@ -72,14 +73,14 @@ func (c Client) ListP(params *Params) *Iter {
 	// Validate input.
 	// TODO: validate symbols..
 	if params == nil || len(params.Symbols) == 0 {
-		return &Iter{finance.GetErrIter(finance.CreateArgumentError())}
+		return &Iter{iter.NewE(finance.CreateArgumentError())}
 	}
 	params.sym = strings.Join(params.Symbols, ",")
 
 	body := &form.Values{}
 	form.AppendTo(body, params)
 
-	return &Iter{finance.GetIter(body, func(b *form.Values) ([]interface{}, error) {
+	return &Iter{iter.New(body, func(b *form.Values) (interface{}, []interface{}, error) {
 
 		resp := response{}
 		err := c.B.Call("/v7/finance/quote", body, params.Context, &resp)
@@ -95,7 +96,7 @@ func (c Client) ListP(params *Params) *Iter {
 			err = finance.CreateRemoteError(resp.Inner.Error)
 		}
 
-		return ret, err
+		return nil, ret, err
 	})}
 }
 
