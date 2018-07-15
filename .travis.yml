@@ -21,7 +21,7 @@ cache:
 
 env:
   global:
-    - FINANCE_MOCK_VERSION=0.0.4
+    - FINANCE_MOCK_VERSION=0.0.5
 
 go:
   - "1.9"

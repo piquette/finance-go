@@ -130,8 +130,6 @@ type Option struct {
 	ExpireDate               int     `json:"expireDate"`
 	Strike                   float64 `json:"strike"`
 	UnderlyingExchangeSymbol string  `json:"underlyingExchangeSymbol"`
-	HeadSymbolAsString       string  `json:"headSymbolAsString"`
-	IsContractSymbol         bool    `json:"contractSymbol"`
 }
 
 // Future represents a single futures contract quote
@@ -284,6 +282,16 @@ type ChartMeta struct {
 	} `json:"currentTradingPeriod"`
 	DataGranularity string   `json:"dataGranularity"`
 	ValidRanges     []string `json:"validRanges"`
+}
+
+// OptionsMeta is meta data associated with an options response.
+type OptionsMeta struct {
+	UnderlyingSymbol   string
+	ExpirationDate     int
+	AllExpirationDates []int
+	Strikes            []float64
+	HasMiniOptions     bool
+	Quote              *Quote
 }
 
 // Straddle is a put/call straddle for a particular strike.
