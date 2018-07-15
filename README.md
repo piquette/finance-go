@@ -26,6 +26,7 @@ Status | Description | Source
 [x] | ETF quote(s) | Yahoo finance
 [x] | Mutual fund quote(s) | Yahoo finance
 [x] | Historical quotes | Yahoo finance
+[x] | Options straddles | Yahoo finance
 [ ] | Options chains | Yahoo finance
 [ ] | Symbols list | BATS
 

@@ -1,4 +1,4 @@
-package history
+package datetime
 
 import (
 	"time"
@@ -58,18 +58,24 @@ type Datetime struct {
 	t     *time.Time
 }
 
-// NewDatetime creates a new instance of Datetime.
-func NewDatetime(t time.Time) *Datetime {
+// New creates a new instance of Datetime from a go time struct.
+func New(t *time.Time) *Datetime {
 	year, month, day := t.Date()
 	return &Datetime{
 		Month: int(month),
 		Day:   day,
 		Year:  year,
-		t:     &t,
+		t:     t,
 	}
 }
 
-// Time returns a time object from a datetime.
+// FromUnix returns a new instance of Datetime from a unix timestamp.
+func FromUnix(timestamp int) *Datetime {
+	t := time.Unix(int64(timestamp), 0)
+	return New(&t)
+}
+
+// Time returns a go time struct from a datetime.
 func (d *Datetime) Time() *time.Time {
 	if d.t != nil {
 		return d.t
@@ -78,22 +84,14 @@ func (d *Datetime) Time() *time.Time {
 	return d.Time()
 }
 
-// ToUnix converts a Datetime struct to
-// a valid unix timestamp.
-func (d *Datetime) ToUnix() int {
+// Unix returns a valid unix timestamp from Datetime fields.
+func (d *Datetime) Unix() int {
 	if d.t != nil {
 		return int(d.t.Unix())
 	}
 
 	d.calculateTime()
-	return d.ToUnix()
-}
-
-// NewDatetimeU converts a valid unix timestamp
-// to a datetime object.
-func NewDatetimeU(timestamp int) *Datetime {
-	t := time.Unix(int64(timestamp), 0)
-	return NewDatetime(t)
+	return d.Unix()
 }
 
 func (d *Datetime) calculateTime() {

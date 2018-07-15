@@ -20,7 +20,7 @@ const (
 	// added in a more recent version of finance-mock, we can show people a
 	// better error message instead of the test suite crashing with a bunch of
 	// confusing 404 errors or the like.
-	MockMinimumVersion = "0.0.4"
+	MockMinimumVersion = "0.0.5"
 	TestServerAddr     = "localhost"
 
 	// Symbols for testing asset classes.
@@ -28,10 +28,11 @@ const (
 	TestETFSymbol        = "SPY"
 	TestFutureSymbol     = "O=F"
 	TestIndexSymbol      = "^GSPC"
-	TestOptionSymbol     = "NYT180518C00016000"
+	TestOptionSymbol     = "AMD180720C00003000"
 	TestMutualFundSymbol = "INPSX"
 	TestForexPairSymbol  = "USDGBP=X"
 	TestCryptoPairSymbol = "BTC-USD"
+	TestStraddleSymbol   = "AMD"
 )
 
 func init() {
@@ -45,7 +46,7 @@ func init() {
 	}
 
 	resp, err := http.Get("http://" + TestServerAddr + ":" + port)
-	if err != nil {
+	if err != nil || resp.StatusCode != http.StatusOK {
 		fmt.Fprintf(os.Stderr, "Couldn't reach finance-mock at `%s:%s`. Is "+
 			"it running? Please see README for setup instructions.\n", TestServerAddr, port)
 		os.Exit(1)

@@ -1,4 +1,4 @@
-package history
+package chart
 
 import (
 	"testing"
@@ -9,26 +9,26 @@ import (
 
 func TestGetEquityChart(t *testing.T) {
 	p := &Params{Symbol: tests.TestEquitySymbol}
-	chart := Get(p)
-	assert.True(t, chart.Next())
+	iter := Get(p)
+	assert.True(t, iter.Next())
 }
 
 func TestGetETFChart(t *testing.T) {
 	p := &Params{Symbol: tests.TestETFSymbol}
-	chart := Get(p)
-	assert.True(t, chart.Next())
+	iter := Get(p)
+	assert.True(t, iter.Next())
 }
 
 func TestGetFutureChart(t *testing.T) {
 	p := &Params{Symbol: tests.TestFutureSymbol}
-	chart := Get(p)
-	assert.True(t, chart.Next())
+	iter := Get(p)
+	assert.True(t, iter.Next())
 }
 
 func TestGetIndexChart(t *testing.T) {
 	p := &Params{Symbol: tests.TestIndexSymbol}
-	chart := Get(p)
-	assert.True(t, chart.Next())
+	iter := Get(p)
+	assert.True(t, iter.Next())
 }
 
 func TestGetOptionChart(t *testing.T) {

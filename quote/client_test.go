@@ -41,7 +41,7 @@ func TestGetPreMarketQuote(t *testing.T) {
 	assert.Equal(t, tests.TestEquitySymbol, q.Symbol)
 }
 
-func TestNilParamsEquity(t *testing.T) {
+func TestNilParamsQuote(t *testing.T) {
 
 	iter := List(nil)
 
@@ -49,7 +49,7 @@ func TestNilParamsEquity(t *testing.T) {
 	assert.Equal(t, "code: api-error, detail: missing function argument", iter.Err().Error())
 }
 
-func TestGetBadEquity(t *testing.T) {
+func TestGetBadQuote(t *testing.T) {
 	tests.SetMarket(finance.MarketStateRegular)
 
 	q, err := Get("TEST")
