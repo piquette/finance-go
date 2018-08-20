@@ -24,7 +24,6 @@ env:
     - FINANCE_MOCK_VERSION=0.0.5
 
 go:
-  - "1.9"
   - "1.10"
   - tip
 
