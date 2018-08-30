@@ -53,8 +53,8 @@ func (i *Iter) Bar() *finance.ChartBar {
 
 // Meta returns the chart metadata
 // related to a chart response.
-func (i *Iter) Meta() *finance.ChartMeta {
-	return i.Iter.Meta().(*finance.ChartMeta)
+func (i *Iter) Meta() finance.ChartMeta {
+	return i.Iter.Meta().(finance.ChartMeta)
 }
 
 // Get returns a historical chart.
