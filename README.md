@@ -4,72 +4,80 @@
 
 ## Summary
 
-Welcome to the greatest best new financial data api library implemented in go :sparkles:
+This go package aims to provide a go application with access to current and historical financial markets data in streamlined, well-formatted structures.
 
-Not production ready! This go package aims to provide a go application with access to financial markets data in streamlined, well-formatted structures.  The real benchmark for success will be method signatures that a programmer from any background can understand on sight- put parameters in, get an error-resistant data structure as a result.
+Check out the [qtrn cli application][qtrn], which is intended as a living example of this package. It prints quotes/options info in your favorite command-line in a few keystrokes!
 
-Accomplishing this goal across several data sources (yfin, morningstar, FRED) etc, while also maximizing code structure flexibility for data source changes in the future is an undertaking that requires some consideration beforehand. So, this README will serve as a planned feature list and development roadmap until a v1 release is stable. Thanks for your patience!
+### Features
 
-### Planned v1.0 features
+Description | Source
+--- | ---
+Quote(s) | Yahoo finance
+Equity quote(s) | Yahoo finance
+Index quote(s) | Yahoo finance
+Option quote(s) | Yahoo finance
+Forex pair quote(s) | Yahoo finance
+Cryptocurrency pair quote(s) | Yahoo finance
+Futures quote(s) | Yahoo finance
+ETF quote(s) | Yahoo finance
+Mutual fund quote(s) | Yahoo finance
+Historical quotes | Yahoo finance
+Options straddles | Yahoo finance
 
-Replication of the current features of FlashBoys/go-finance.
+## Documentation
 
-Status | Description | Source
---- | --- | ---
-[x] | Quote(s) | Yahoo finance
-[x] | Equity quote(s) | Yahoo finance
-[x] | Index quote(s) | Yahoo finance
-[x] | Option quote(s) | Yahoo finance
-[x] | Forex pair quote(s) | Yahoo finance
-[x] | Cryptocurrency pair quote(s) | Yahoo finance
-[x] | Futures quote(s) | Yahoo finance
-[x] | ETF quote(s) | Yahoo finance
-[x] | Mutual fund quote(s) | Yahoo finance
-[x] | Historical quotes | Yahoo finance
-[x] | Options straddles | Yahoo finance
-[ ] | Options chains | Yahoo finance
-[ ] | Symbols list | BATS
+A neatly formatted detailed list of implementation instructions and examples will be available on the [piquette website][api-docs].
 
-## Planned v1.0 documentation
-
-A neatly formatted detailed list of implementation instructions and examples will be coming to the [piquette website][api-docs].
-
-For details on all the functionality in this library, see the [GoDoc][godoc] documentation.
+For now, for details on all the functionality in this library, see the [GoDoc][godoc] documentation.
 
 ## Installation
+
+It is best to use a dependency management tool, but if you want to retrieve it manually, use -
 
 ```sh
 go get github.com/piquette/finance-go
 ```
 
-## Usage examples
+## Usage example
 
 Library usage is meant to be very specific about the user's intentions.
 
 ### Quote
 ```go
-quote, err := equity.Get("AAPL")
+q, err := quote.Get("AAPL")
 if err != nil {
   // Uh-oh.  
   panic(err)
 }
 
 // Success!
-fmt.Println(quote)
+fmt.Println(q)
 ```
 
-### Historical data
+### Equity quote (more fields)
 ```go
-params := &history.Params{
-  Symbol:   "TWTR",
-  Interval: history.OneHour,
+q, err := equity.Get("AAPL")
+if err != nil {
+  // Uh-oh.  
+  panic(err)
 }
-chart := history.Get(params)
 
-for chart.Next() {
-  fmt.Println(chart.Bar())
+// Success!
+fmt.Println(q)
+```
+
+### Historical quotes (OHLCV)
+```go
+params := &chart.Params{
+  Symbol:   "TWTR",
+  Interval: datetime.OneHour,
 }
-if err := chart.Err(); err != nil {
+iter := chart.Get(params)
+
+for iter.Next() {
+  fmt.Println(iter.Bar())
+}
+if err := iter.Err(); err != nil {
   fmt.Println(err)
 }
 ```
@@ -126,6 +134,7 @@ pull request][pulls]. Also please email or tweet me as needed.
 
 [godoc]: http://godoc.org/github.com/piquette/finance-go
 [issues]: https://github.com/piquette/finance-go/issues/new
+[qtrn]: https://github.com/piquette/qtrn
 [pulls]: https://github.com/piquette/finance-go/pulls
 [finance-mock]: https://github.com/piquette/finance-mock
 [stripe]: https://github.com/stripe/stripe-go
