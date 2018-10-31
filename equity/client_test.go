@@ -15,7 +15,7 @@ func TestGetRegularMarketEquity(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, q)
-	assert.Equal(t, finance.MarketStateRegular, q.MarketState)
+	assert.Equal(t, string(finance.MarketStateRegular), string(q.MarketState))
 	assert.Equal(t, tests.TestEquitySymbol, q.Symbol)
 }
 
@@ -26,7 +26,7 @@ func TestGetPostMarketEquity(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, q)
-	assert.Equal(t, finance.MarketStatePost, q.MarketState)
+	assert.Equal(t, string(finance.MarketStatePost), string(q.MarketState))
 	assert.Equal(t, tests.TestEquitySymbol, q.Symbol)
 }
 
@@ -37,7 +37,7 @@ func TestGetPreMarketEquity(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, q)
-	assert.Equal(t, finance.MarketStatePre, q.MarketState)
+	assert.Equal(t, string(finance.MarketStatePre), string(q.MarketState))
 	assert.Equal(t, tests.TestEquitySymbol, q.Symbol)
 }
 
