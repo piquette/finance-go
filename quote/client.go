@@ -40,6 +40,25 @@ func (i *Iter) Quote() *finance.Quote {
 	return i.Current().(*finance.Quote)
 }
 
+//Gives the Day's Close when you input a historical date
+func GetHistoricalQuote(symbol string, month int, day int, year int) (float64, error) {
+	p := &chart.Params{
+		Symbol:   symbol,
+		Start:    &datetime.Datetime{Month: month, Day: day, Year: year},
+		End:      &datetime.Datetime{Month: month, Day: day+1, Year: year},
+		Interval: datetime.OneDay,
+	  }
+	iter := chart.Get(p)
+	r := iter.Iter.Meta()
+	v := reflect.ValueOf(r)
+
+	values := make([]interface{}, v.NumField())
+	for i := 0; i < v.NumField(); i++ {
+		values[i] = v.Field(i).Interface()
+	}
+	return values[8].(float64), nil
+}
+
 // Get returns an Quote quote that matches the parameters specified.
 func Get(symbol string) (*finance.Quote, error) {
 	i := List([]string{symbol})
