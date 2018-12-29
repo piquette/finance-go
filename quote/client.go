@@ -3,10 +3,8 @@ package quote
 import (
 	"context"
 	"strings"
-	"reflect"
 
 	chart "github.com/piquette/finance-go/chart"
-	"fmt"
 	finance "github.com/piquette/finance-go"
 	"github.com/piquette/finance-go/form"
 	"github.com/piquette/finance-go/iter"
