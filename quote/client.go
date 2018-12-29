@@ -55,7 +55,7 @@ func GetHistoricalQuote(symbol string, month int, day int, year int) (*finance.C
 		b := iter.Bar()
 		return b, nil
 	}
-	return nil, nil
+	return nil, iter.Err()
 }
 
 // Get returns an Quote quote that matches the parameters specified.
