@@ -33,6 +33,9 @@ const (
 	TestForexPairSymbol  = "USDGBP=X"
 	TestCryptoPairSymbol = "BTC-USD"
 	TestStraddleSymbol   = "AMD"
+	TestMonth 			 = 1
+	TestDay              = 11
+	TestYear             = 2018
 )
 
 func init() {

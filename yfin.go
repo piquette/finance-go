@@ -249,6 +249,16 @@ type ChartBar struct {
 	Timestamp int
 }
 
+type OHLCHistoric struct {
+	Open		float64
+	Low			float64
+	High		float64
+	Close		float64
+	AdjClose	float64
+	Volume		int
+	Timestamp 	int
+}
+
 // ChartMeta is meta data associated with a chart response.
 type ChartMeta struct {
 	Currency             string    `json:"currency"`
