@@ -1,8 +1,28 @@
+language: go
+
+matrix:
+  allow_failures:
+    - go: tip
+  fast_finish: true
+  include:
+  - go: 1.11.x
+    env: GO111MODULE=on
+  - go: 1.12.x
+    env: GO111MODULE=on
+  - go: 1.13.x
+  - go: tip
+
 before_install:
-  # Install code coverage / coveralls tooling
-  - go get -u golang.org/x/tools/cmd/cover
-  - go get -u github.com/modocache/gover
-  - go get -u github.com/mattn/goveralls
+  - if [[ "${GO111MODULE}" = "on" ]]; then mkdir "${HOME}/go"; export GOPATH="${HOME}/go"; fi
+  - go mod download
+  - if [[ "${GO111MODULE}" = "on" ]]; then export PATH="${GOPATH}/bin:${GOROOT}/bin:${PATH}"; fi
+
+  # Install lint / code coverage / coveralls tooling
+  - travis_retry go get -u golang.org/x/net/http2
+  - travis_retry go get -u golang.org/x/tools/cmd/cover
+  - travis_retry go get -u github.com/modocache/gover
+  - travis_retry go get -u github.com/mattn/goveralls
+  - travis_retry go get -u golang.org/x/lint/golint
 
   # Unpack and start test server so that the test suite can talk to it
   - |
@@ -22,17 +42,6 @@ cache:
 env:
   global:
     - FINANCE_MOCK_VERSION=0.0.5
-
-go:
-  - "1.10"
-  - tip
-
-language: go
-
-matrix:
-  allow_failures:
-    - go: tip
-  fast_finish: true
 
 script:
   - make

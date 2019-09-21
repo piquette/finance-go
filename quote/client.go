@@ -4,11 +4,11 @@ import (
 	"context"
 	"strings"
 
-	chart "github.com/piquette/finance-go/chart"
 	finance "github.com/piquette/finance-go"
+	chart "github.com/piquette/finance-go/chart"
+	"github.com/piquette/finance-go/datetime"
 	"github.com/piquette/finance-go/form"
 	"github.com/piquette/finance-go/iter"
-	"github.com/piquette/finance-go/datetime"
 )
 
 // Client is used to invoke quote APIs.
@@ -42,14 +42,14 @@ func (i *Iter) Quote() *finance.Quote {
 	return i.Current().(*finance.Quote)
 }
 
-//Gives the Day's Close when you input a historical date
+// GetHistoricalQuote provides a single chart bar for a historical date.
 func GetHistoricalQuote(symbol string, month int, day int, year int) (*finance.ChartBar, error) {
 	p := &chart.Params{
 		Symbol:   symbol,
 		Start:    &datetime.Datetime{Month: month, Day: day, Year: year},
 		End:      &datetime.Datetime{Month: month, Day: day, Year: year},
 		Interval: datetime.OneDay,
-	  }
+	}
 	iter := chart.Get(p)
 	for iter.Next() {
 		b := iter.Bar()

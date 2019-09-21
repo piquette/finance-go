@@ -23,9 +23,9 @@ func TestHistoricalQuote(t *testing.T) {
 	TestMonth := 1
 	TestDay := 11
 	TestYear := 2018
-	
+
 	q, err := GetHistoricalQuote(tests.TestEquitySymbol, TestMonth, TestDay, TestYear)
-	
+
 	assert.Nil(t, err)
 	assert.NotNil(t, q)
 	high, _ := q.High.Float64()

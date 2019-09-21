@@ -32,7 +32,7 @@ For now, for details on all the functionality in this library, see the [GoDoc][g
 
 ## Installation
 
-It is best to use a dependency management tool, but if you want to retrieve it manually, use -
+This project supports modules and Go 1.13+. Add `finance-go` to your own project the usual way -
 
 ```sh
 go get github.com/piquette/finance-go
