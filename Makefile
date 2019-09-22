@@ -1,10 +1,16 @@
-all: test vet
+all: test bench vet lint check-gofmt
 
 bench:
 	go test -race -bench . -run "Benchmark" ./form
 
 build:
 	go build ./...
+
+check-gofmt:
+	scripts/check_gofmt.sh
+
+lint:
+	golint -set_exit_status ./...
 
 test:
 	go test -v ./...
