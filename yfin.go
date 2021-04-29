@@ -77,39 +77,39 @@ type Params struct {
 type Equity struct {
 	Quote
 	// Equity-only fields.
-	LongName                    string  `json:"longName"`
-	EpsTrailingTwelveMonths     float64 `json:"epsTrailingTwelveMonths"`
-	EpsForward                  float64 `json:"epsForward"`
-	EarningsTimestamp           int     `json:"earningsTimestamp"`
-	EarningsTimestampStart      int     `json:"earningsTimestampStart"`
-	EarningsTimestampEnd        int     `json:"earningsTimestampEnd"`
-	TrailingAnnualDividendRate  float64 `json:"trailingAnnualDividendRate"`
-	DividendDate                int     `json:"dividendDate"`
-	TrailingAnnualDividendYield float64 `json:"trailingAnnualDividendYield"`
-	TrailingPE                  float64 `json:"trailingPE"`
-	ForwardPE                   float64 `json:"forwardPE"`
-	BookValue                   float64 `json:"bookValue"`
-	PriceToBook                 float64 `json:"priceToBook"`
-	SharesOutstanding           int     `json:"sharesOutstanding"`
-	MarketCap                   int64   `json:"marketCap"`
+	LongName                    string  `json:"longName" csv:"longName"`
+	EpsTrailingTwelveMonths     float64 `json:"epsTrailingTwelveMonths" csv:"epsTrailingTwelveMonths"`
+	EpsForward                  float64 `json:"epsForward" csv:"epsForward"`
+	EarningsTimestamp           int     `json:"earningsTimestamp" csv:"earningsTimestamp"`
+	EarningsTimestampStart      int     `json:"earningsTimestampStart" csv:"earningsTimestampStart"`
+	EarningsTimestampEnd        int     `json:"earningsTimestampEnd" csv:"earningsTimestampEnd"`
+	TrailingAnnualDividendRate  float64 `json:"trailingAnnualDividendRate" csv:"trailingAnnualDividendRate"`
+	DividendDate                int     `json:"dividendDate" csv:"dividendDate"`
+	TrailingAnnualDividendYield float64 `json:"trailingAnnualDividendYield" csv:"trailingAnnualDividendYield"`
+	TrailingPE                  float64 `json:"trailingPE" csv:"trailingPE"`
+	ForwardPE                   float64 `json:"forwardPE" csv:"forwardPE"`
+	BookValue                   float64 `json:"bookValue" csv:"bookValue"`
+	PriceToBook                 float64 `json:"priceToBook" csv:"priceToBook"`
+	SharesOutstanding           int     `json:"sharesOutstanding" csv:"sharesOutstanding"`
+	MarketCap                   int64   `json:"marketCap" csv:"marketCap"`
 }
 
 // ETF represents a single etf quote.
 type ETF struct {
 	Quote
 	// MutualFund/ETF-only fields.
-	YTDReturn                    float64 `json:"ytdReturn"`
-	TrailingThreeMonthReturns    float64 `json:"trailingThreeMonthReturns"`
-	TrailingThreeMonthNavReturns float64 `json:"trailingThreeMonthNavReturns"`
+	YTDReturn                    float64 `json:"ytdReturn" csv:"ytdReturn"`
+	TrailingThreeMonthReturns    float64 `json:"trailingThreeMonthReturns" csv:"trailingThreeMonthReturns"`
+	TrailingThreeMonthNavReturns float64 `json:"trailingThreeMonthNavReturns" csv:"trailingThreeMonthNavReturns"`
 }
 
 // MutualFund represents a single mutual fund share quote.
 type MutualFund struct {
 	Quote
 	// MutualFund/ETF-only fields.
-	YTDReturn                    float64 `json:"ytdReturn"`
-	TrailingThreeMonthReturns    float64 `json:"trailingThreeMonthReturns"`
-	TrailingThreeMonthNavReturns float64 `json:"trailingThreeMonthNavReturns"`
+	YTDReturn                    float64 `json:"ytdReturn" csv:"ytdReturn"`
+	TrailingThreeMonthReturns    float64 `json:"trailingThreeMonthReturns" csv:"trailingThreeMonthReturns"`
+	TrailingThreeMonthNavReturns float64 `json:"trailingThreeMonthNavReturns" csv:"trailingThreeMonthNavReturns"`
 }
 
 // Index represents a single market Index quote.
@@ -125,11 +125,11 @@ type Index struct {
 type Option struct {
 	Quote
 	// Options/Futures-only fields.
-	UnderlyingSymbol         string  `json:"underlyingSymbol"`
-	OpenInterest             int     `json:"openInterest"`
-	ExpireDate               int     `json:"expireDate"`
-	Strike                   float64 `json:"strike"`
-	UnderlyingExchangeSymbol string  `json:"underlyingExchangeSymbol"`
+	UnderlyingSymbol         string  `json:"underlyingSymbol" csv:"underlyingSymbol"`
+	OpenInterest             int     `json:"openInterest" csv:"openInterest"`
+	ExpireDate               int     `json:"expireDate" csv:"expireDate"`
+	Strike                   float64 `json:"strike" csv:"strike"`
+	UnderlyingExchangeSymbol string  `json:"underlyingExchangeSymbol" csv:"underlyingExchangeSymbol"`
 }
 
 // Future represents a single futures contract quote
@@ -137,13 +137,13 @@ type Option struct {
 type Future struct {
 	Quote
 	// Options/Futures-only fields.
-	UnderlyingSymbol         string  `json:"underlyingSymbol"`
-	OpenInterest             int     `json:"openInterest"`
-	ExpireDate               int     `json:"expireDate"`
-	Strike                   float64 `json:"strike"`
-	UnderlyingExchangeSymbol string  `json:"underlyingExchangeSymbol"`
-	HeadSymbolAsString       string  `json:"headSymbolAsString"`
-	IsContractSymbol         bool    `json:"contractSymbol"`
+	UnderlyingSymbol         string  `json:"underlyingSymbol" csv:"underlyingSymbol"`
+	OpenInterest             int     `json:"openInterest" csv:"openInterest"`
+	ExpireDate               int     `json:"expireDate" csv:"expireDate"`
+	Strike                   float64 `json:"strike" csv:"strike"`
+	UnderlyingExchangeSymbol string  `json:"underlyingExchangeSymbol" csv:"underlyingExchangeSymbol"`
+	HeadSymbolAsString       string  `json:"headSymbolAsString" csv:"headSymbolAsString"`
+	IsContractSymbol         bool    `json:"contractSymbol" csv:"contractSymbol"`
 }
 
 // ForexPair represents a single forex currency pair quote.
@@ -155,12 +155,12 @@ type ForexPair struct {
 type CryptoPair struct {
 	Quote
 	// Cryptocurrency-only fields.
-	Algorithm           string `json:"algorithm"`
-	StartDate           int    `json:"startDate"`
-	MaxSupply           int    `json:"maxSupply"`
-	CirculatingSupply   int    `json:"circulatingSupply"`
-	VolumeLastDay       int    `json:"volume24Hr"`
-	VolumeAllCurrencies int    `json:"volumeAllCurrencies"`
+	Algorithm           string `json:"algorithm" csv:"algorithm"`
+	StartDate           int    `json:"startDate" csv:"startDate"`
+	MaxSupply           int    `json:"maxSupply" csv:"maxSupply"`
+	CirculatingSupply   int    `json:"circulatingSupply" csv:"circulatingSupply"`
+	VolumeLastDay       int    `json:"volume24Hr" csv:"volume24Hr"`
+	VolumeAllCurrencies int    `json:"volumeAllCurrencies" csv:"volumeAllCurrencies"`
 }
 
 // Quote is the basic quote structure shared across
@@ -170,72 +170,72 @@ type CryptoPair struct {
 // possible assets.
 type Quote struct {
 	// Quote classifying fields.
-	Symbol      string      `json:"symbol"`
-	MarketState MarketState `json:"marketState"`
-	QuoteType   QuoteType   `json:"quoteType"`
-	ShortName   string      `json:"shortName"`
+	Symbol      string      `json:"symbol" csv:"symbol"`
+	MarketState MarketState `json:"marketState" csv:"marketState"`
+	QuoteType   QuoteType   `json:"quoteType" csv:"quoteType"`
+	ShortName   string      `json:"shortName" csv:"shortName"`
 
 	// Regular session quote data.
-	RegularMarketChangePercent float64 `json:"regularMarketChangePercent"`
-	RegularMarketPreviousClose float64 `json:"regularMarketPreviousClose"`
-	RegularMarketPrice         float64 `json:"regularMarketPrice"`
-	RegularMarketTime          int     `json:"regularMarketTime"`
-	RegularMarketChange        float64 `json:"regularMarketChange"`
-	RegularMarketOpen          float64 `json:"regularMarketOpen"`
-	RegularMarketDayHigh       float64 `json:"regularMarketDayHigh"`
-	RegularMarketDayLow        float64 `json:"regularMarketDayLow"`
-	RegularMarketVolume        int     `json:"regularMarketVolume"`
+	RegularMarketChangePercent float64 `json:"regularMarketChangePercent" csv:"regularMarketChangePercent"`
+	RegularMarketPreviousClose float64 `json:"regularMarketPreviousClose" csv:"regularMarketPreviousClose"`
+	RegularMarketPrice         float64 `json:"regularMarketPrice" csv:"regularMarketPrice"`
+	RegularMarketTime          int     `json:"regularMarketTime" csv:"regularMarketTime"`
+	RegularMarketChange        float64 `json:"regularMarketChange" csv:"regularMarketChange"`
+	RegularMarketOpen          float64 `json:"regularMarketOpen" csv:"regularMarketOpen"`
+	RegularMarketDayHigh       float64 `json:"regularMarketDayHigh" csv:"regularMarketDayHigh"`
+	RegularMarketDayLow        float64 `json:"regularMarketDayLow" csv:"regularMarketDayLow"`
+	RegularMarketVolume        int     `json:"regularMarketVolume" csv:"regularMarketVolume"`
 
 	// Quote depth.
-	Bid     float64 `json:"bid"`
-	Ask     float64 `json:"ask"`
-	BidSize int     `json:"bidSize"`
-	AskSize int     `json:"askSize"`
+	Bid     float64 `json:"bid" csv:"bid"`
+	Ask     float64 `json:"ask" csv:"ask"`
+	BidSize int     `json:"bidSize" csv:"bidSize"`
+	AskSize int     `json:"askSize" csv:"askSize"`
 
 	// Pre-market quote data.
-	PreMarketPrice         float64 `json:"preMarketPrice"`
-	PreMarketChange        float64 `json:"preMarketChange"`
-	PreMarketChangePercent float64 `json:"preMarketChangePercent"`
-	PreMarketTime          int     `json:"preMarketTime"`
+	PreMarketPrice         float64 `json:"preMarketPrice" csv:"preMarketPrice"`
+	PreMarketChange        float64 `json:"preMarketChange" csv:"preMarketChange"`
+	PreMarketChangePercent float64 `json:"preMarketChangePercent" csv:"preMarketChangePercent"`
+	PreMarketTime          int     `json:"preMarketTime" csv:"preMarketTime"`
 
 	// Post-market quote data.
-	PostMarketPrice         float64 `json:"postMarketPrice"`
-	PostMarketChange        float64 `json:"postMarketChange"`
-	PostMarketChangePercent float64 `json:"postMarketChangePercent"`
-	PostMarketTime          int     `json:"postMarketTime"`
+	PostMarketPrice         float64 `json:"postMarketPrice" csv:"postMarketPrice"`
+	PostMarketChange        float64 `json:"postMarketChange" csv:"postMarketChange"`
+	PostMarketChangePercent float64 `json:"postMarketChangePercent" csv:"postMarketChangePercent"`
+	PostMarketTime          int     `json:"postMarketTime" csv:"postMarketTime"`
 
 	// 52wk ranges.
-	FiftyTwoWeekLowChange         float64 `json:"fiftyTwoWeekLowChange"`
-	FiftyTwoWeekLowChangePercent  float64 `json:"fiftyTwoWeekLowChangePercent"`
-	FiftyTwoWeekHighChange        float64 `json:"fiftyTwoWeekHighChange"`
-	FiftyTwoWeekHighChangePercent float64 `json:"fiftyTwoWeekHighChangePercent"`
-	FiftyTwoWeekLow               float64 `json:"fiftyTwoWeekLow"`
-	FiftyTwoWeekHigh              float64 `json:"fiftyTwoWeekHigh"`
+	FiftyTwoWeekLowChange         float64 `json:"fiftyTwoWeekLowChange" csv:"fiftyTwoWeekLowChange"`
+	FiftyTwoWeekLowChangePercent  float64 `json:"fiftyTwoWeekLowChangePercent" csv:"fiftyTwoWeekLowChangePercent"`
+	FiftyTwoWeekHighChange        float64 `json:"fiftyTwoWeekHighChange" csv:"fiftyTwoWeekHighChange"`
+	FiftyTwoWeekHighChangePercent float64 `json:"fiftyTwoWeekHighChangePercent" csv:"fiftyTwoWeekHighChangePercent"`
+	FiftyTwoWeekLow               float64 `json:"fiftyTwoWeekLow" csv:"fiftyTwoWeekLow"`
+	FiftyTwoWeekHigh              float64 `json:"fiftyTwoWeekHigh" csv:"fiftyTwoWeekHigh"`
 
 	// Averages.
-	FiftyDayAverage                   float64 `json:"fiftyDayAverage"`
-	FiftyDayAverageChange             float64 `json:"fiftyDayAverageChange"`
-	FiftyDayAverageChangePercent      float64 `json:"fiftyDayAverageChangePercent"`
-	TwoHundredDayAverage              float64 `json:"twoHundredDayAverage"`
-	TwoHundredDayAverageChange        float64 `json:"twoHundredDayAverageChange"`
-	TwoHundredDayAverageChangePercent float64 `json:"twoHundredDayAverageChangePercent"`
+	FiftyDayAverage                   float64 `json:"fiftyDayAverage" csv:"fiftyDayAverage"`
+	FiftyDayAverageChange             float64 `json:"fiftyDayAverageChange" csv:"fiftyDayAverageChange"`
+	FiftyDayAverageChangePercent      float64 `json:"fiftyDayAverageChangePercent" csv:"fiftyDayAverageChangePercent"`
+	TwoHundredDayAverage              float64 `json:"twoHundredDayAverage" csv:"twoHundredDayAverage"`
+	TwoHundredDayAverageChange        float64 `json:"twoHundredDayAverageChange" csv:"twoHundredDayAverageChange"`
+	TwoHundredDayAverageChangePercent float64 `json:"twoHundredDayAverageChangePercent" csv:"twoHundredDayAverageChangePercent"`
 
 	// Volume metrics.
-	AverageDailyVolume3Month int `json:"averageDailyVolume3Month"`
-	AverageDailyVolume10Day  int `json:"averageDailyVolume10Day"`
+	AverageDailyVolume3Month int `json:"averageDailyVolume3Month" csv:"averageDailyVolume3Month"`
+	AverageDailyVolume10Day  int `json:"averageDailyVolume10Day" csv:"averageDailyVolume10Day"`
 
 	// Quote meta-data.
-	QuoteSource               string `json:"quoteSourceName"`
-	CurrencyID                string `json:"currency"`
-	IsTradeable               bool   `json:"tradeable"`
-	QuoteDelay                int    `json:"exchangeDataDelayedBy"`
-	FullExchangeName          string `json:"fullExchangeName"`
-	SourceInterval            int    `json:"sourceInterval"`
-	ExchangeTimezoneName      string `json:"exchangeTimezoneName"`
-	ExchangeTimezoneShortName string `json:"exchangeTimezoneShortName"`
-	GMTOffSetMilliseconds     int    `json:"gmtOffSetMilliseconds"`
-	MarketID                  string `json:"market"`
-	ExchangeID                string `json:"exchange"`
+	QuoteSource               string `json:"quoteSourceName" csv:"quoteSourceName"`
+	CurrencyID                string `json:"currency" csv:"currency"`
+	IsTradeable               bool   `json:"tradeable" csv:"tradeable"`
+	QuoteDelay                int    `json:"exchangeDataDelayedBy" csv:"exchangeDataDelayedBy"`
+	FullExchangeName          string `json:"fullExchangeName" csv:"fullExchangeName"`
+	SourceInterval            int    `json:"sourceInterval" csv:"sourceInterval"`
+	ExchangeTimezoneName      string `json:"exchangeTimezoneName" csv:"exchangeTimezoneName"`
+	ExchangeTimezoneShortName string `json:"exchangeTimezoneShortName" csv:"exchangeTimezoneShortName"`
+	GMTOffSetMilliseconds     int    `json:"gmtOffSetMilliseconds" csv:"gmtOffSetMilliseconds"`
+	MarketID                  string `json:"market" csv:"market"`
+	ExchangeID                string `json:"exchange" csv:"exchange"`
 }
 
 // ChartBar is a single instance of a chart bar.
@@ -262,71 +262,71 @@ type OHLCHistoric struct {
 
 // ChartMeta is meta data associated with a chart response.
 type ChartMeta struct {
-	Currency             string    `json:"currency"`
-	Symbol               string    `json:"symbol"`
-	ExchangeName         string    `json:"exchangeName"`
-	QuoteType            QuoteType `json:"instrumentType"`
-	FirstTradeDate       int       `json:"firstTradeDate"`
-	Gmtoffset            int       `json:"gmtoffset"`
-	Timezone             string    `json:"timezone"`
-	ExchangeTimezoneName string    `json:"exchangeTimezoneName"`
-	ChartPreviousClose   float64   `json:"chartPreviousClose"`
+	Currency             string    `json:"currency" csv:"currency"`
+	Symbol               string    `json:"symbol" csv:"symbol"`
+	ExchangeName         string    `json:"exchangeName" csv:"exchangeName"`
+	QuoteType            QuoteType `json:"instrumentType" csv:"instrumentType"`
+	FirstTradeDate       int       `json:"firstTradeDate" csv:"firstTradeDate"`
+	Gmtoffset            int       `json:"gmtoffset" csv:"gmtoffset"`
+	Timezone             string    `json:"timezone" csv:"timezone"`
+	ExchangeTimezoneName string    `json:"exchangeTimezoneName" csv:"exchangeTimezoneName"`
+	ChartPreviousClose   float64   `json:"chartPreviousClose" csv:"chartPreviousClose"`
 	CurrentTradingPeriod struct {
 		Pre struct {
-			Timezone  string `json:"timezone"`
-			Start     int    `json:"start"`
-			End       int    `json:"end"`
-			Gmtoffset int    `json:"gmtoffset"`
-		} `json:"pre"`
+			Timezone  string `json:"timezone" csv:"timezone"`
+			Start     int    `json:"start" csv:"start"`
+			End       int    `json:"end" csv:"end"`
+			Gmtoffset int    `json:"gmtoffset" csv:"gmtoffset"`
+		} `json:"pre" csv:"pre_,inline"`
 		Regular struct {
-			Timezone  string `json:"timezone"`
-			Start     int    `json:"start"`
-			End       int    `json:"end"`
-			Gmtoffset int    `json:"gmtoffset"`
-		} `json:"regular"`
+			Timezone  string `json:"timezone" csv:"timezone"`
+			Start     int    `json:"start" csv:"start"`
+			End       int    `json:"end" csv:"end"`
+			Gmtoffset int    `json:"gmtoffset" csv:"gmtoffset"`
+		} `json:"regular" csv:"regular_,inline"`
 		Post struct {
-			Timezone  string `json:"timezone"`
-			Start     int    `json:"start"`
-			End       int    `json:"end"`
-			Gmtoffset int    `json:"gmtoffset"`
-		} `json:"post"`
-	} `json:"currentTradingPeriod"`
-	DataGranularity string   `json:"dataGranularity"`
-	ValidRanges     []string `json:"validRanges"`
+			Timezone  string `json:"timezone" csv:"timezone"`
+			Start     int    `json:"start" csv:"start"`
+			End       int    `json:"end" csv:"end"`
+			Gmtoffset int    `json:"gmtoffset" csv:"gmtoffset"`
+		} `json:"post" csv:"post_,inline"`
+	} `json:"currentTradingPeriod" csv:"currentTradingPeriod_,inline"`
+	DataGranularity string   `json:"dataGranularity" csv:"dataGranularity"`
+	ValidRanges     []string `json:"validRanges" csv:"-"`
 }
 
 // OptionsMeta is meta data associated with an options response.
 type OptionsMeta struct {
-	UnderlyingSymbol   string
-	ExpirationDate     int
-	AllExpirationDates []int
-	Strikes            []float64
-	HasMiniOptions     bool
-	Quote              *Quote
+	UnderlyingSymbol   string    `json:"underlyingSymbol" csv:"underlyingSymbol"`
+	ExpirationDate     int       `json:"expirationDate" csv:"expirationDate"`
+	AllExpirationDates []int     `json:"allExpirationDates" csv:"-"`
+	Strikes            []float64 `json:"strikes" csv:"-"`
+	HasMiniOptions     bool      `json:"hasMiniOptions"`
+	Quote              *Quote    `json:"quote,omitempty" csv:"quote_,inline"`
 }
 
 // Straddle is a put/call straddle for a particular strike.
 type Straddle struct {
-	Strike float64   `json:"strike"`
-	Call   *Contract `json:"call,omitempty"`
-	Put    *Contract `json:"put,omitempty"`
+	Strike float64   `json:"strike" csv:"strike"`
+	Call   *Contract `json:"call,omitempty" csv:"call_,inline"`
+	Put    *Contract `json:"put,omitempty" csv:"put_,inline"`
 }
 
 // Contract is a struct containing a single option contract, usually part of a chain.
 type Contract struct {
-	Symbol            string  `json:"contractSymbol"`
-	Strike            float64 `json:"strike"`
-	Currency          string  `json:"currency"`
-	LastPrice         float64 `json:"lastPrice"`
-	Change            float64 `json:"change"`
-	PercentChange     float64 `json:"percentChange"`
-	Volume            int     `json:"volume"`
-	OpenInterest      int     `json:"openInterest"`
-	Bid               float64 `json:"bid"`
-	Ask               float64 `json:"ask"`
-	Size              string  `json:"contractSize"`
-	Expiration        int     `json:"expiration"`
-	LastTradeDate     int     `json:"lastTradeDate"`
-	ImpliedVolatility float64 `json:"impliedVolatility"`
-	InTheMoney        bool    `json:"inTheMoney"`
+	Symbol            string  `json:"contractSymbol" csv:"contractSymbol"`
+	Strike            float64 `json:"strike" csv:"strike"`
+	Currency          string  `json:"currency" csv:"currency"`
+	LastPrice         float64 `json:"lastPrice" csv:"lastPrice"`
+	Change            float64 `json:"change" csv:"change"`
+	PercentChange     float64 `json:"percentChange" csv:"percentChange"`
+	Volume            int     `json:"volume" csv:"volume"`
+	OpenInterest      int     `json:"openInterest" csv:"openInterest"`
+	Bid               float64 `json:"bid" csv:"bid"`
+	Ask               float64 `json:"ask" csv:"ask"`
+	Size              string  `json:"contractSize" csv:"contractSize"`
+	Expiration        int     `json:"expiration" csv:"expiration"`
+	LastTradeDate     int     `json:"lastTradeDate" csv:"lastTradeDate"`
+	ImpliedVolatility float64 `json:"impliedVolatility" csv:"impliedVolatility"`
+	InTheMoney        bool    `json:"inTheMoney" csv:"inTheMoney"`
 }
