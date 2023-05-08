@@ -101,7 +101,7 @@ func (c Client) ListP(params *Params) *Iter {
 	return &Iter{iter.New(body, func(b *form.Values) (interface{}, []interface{}, error) {
 
 		resp := response{}
-		err := c.B.Call("/v7/finance/quote", body, params.Context, &resp)
+		err := c.B.Call("/v6/finance/quote", body, params.Context, &resp)
 		if err != nil {
 			err = finance.CreateRemoteError(err)
 		}
