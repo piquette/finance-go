@@ -19,7 +19,7 @@ type Printfer interface {
 	Printf(format string, v ...interface{})
 }
 
-// init sets inital logger defaults.
+// init sets initial logger defaults.
 func init() {
 	Logger = log.New(os.Stderr, "", log.LstdFlags)
 }
