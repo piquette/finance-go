@@ -82,7 +82,8 @@ type BackendConfiguration struct {
 	HTTPClient *http.Client
 }
 
-type YahooConfiguration struct {
+// yahooConfiguration is a specialization that includes a crumb and cookies for the yahoo API
+type yahooConfiguration struct {
 	BackendConfiguration
 	expiry  time.Time
 	cookies string
@@ -106,7 +107,7 @@ func SetHTTPClient(client *http.Client) {
 // should only need to use this for testing purposes or on App Engine.
 func NewBackends(httpClient *http.Client) *Backends {
 	return &Backends{
-		YFin: &YahooConfiguration{
+		YFin: &yahooConfiguration{
 			BackendConfiguration{YFinBackend, YFinURL, httpClient},
 			time.Time{},
 			"",
@@ -130,7 +131,7 @@ func GetBackend(backend SupportedBackend) Backend {
 		}
 		backends.mu.Lock()
 		defer backends.mu.Unlock()
-		backends.YFin = &YahooConfiguration{
+		backends.YFin = &yahooConfiguration{
 			BackendConfiguration{YFinBackend, YFinURL, httpClient},
 			time.Time{},
 			"",
@@ -163,11 +164,11 @@ func SetBackend(backend SupportedBackend, b Backend) {
 	}
 }
 
-func fetchCookies() (error, string, time.Time) {
+func fetchCookies() (string, time.Time, error) {
 	client := http.Client{}
 	request, err := http.NewRequest("GET", cookieURL, nil)
 	if err != nil {
-		return err, "", time.Time{}
+		return "", time.Time{}, err
 	}
 
 	request.Header = http.Header{
@@ -187,7 +188,7 @@ func fetchCookies() (error, string, time.Time) {
 
 	response, err := client.Do(request)
 	if err != nil {
-		return err, "", time.Time{}
+		return "", time.Time{}, err
 	}
 	defer response.Body.Close()
 
@@ -212,14 +213,14 @@ func fetchCookies() (error, string, time.Time) {
 		}
 	}
 	result = strings.TrimSuffix(result, "; ")
-	return nil, result, expiry
+	return result, expiry, nil
 }
 
-func fetchCrumb(cookies string) (error, string) {
+func fetchCrumb(cookies string) (string, error) {
 	client := http.Client{}
 	request, err := http.NewRequest("GET", crumbURL, nil)
 	if err != nil {
-		return err, ""
+		return "", err
 	}
 
 	request.Header = http.Header{
@@ -239,25 +240,25 @@ func fetchCrumb(cookies string) (error, string) {
 
 	response, err := client.Do(request)
 	if err != nil {
-		return err, ""
+		return "", err
 	}
 	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return err, ""
+		return "", err
 	}
 
-	return nil, string(body[:])
+	return string(body[:]), nil
 }
 
-func (s *YahooConfiguration) refreshCrumb() error {
-	err, cookies, expiry := fetchCookies()
+func (s *yahooConfiguration) refreshCrumb() error {
+	cookies, expiry, err := fetchCookies()
 	if err != nil {
 		return err
 	}
 
-	err, crumb := fetchCrumb(cookies)
+	crumb, err := fetchCrumb(cookies)
 	if err != nil {
 		return err
 	}
@@ -268,7 +269,8 @@ func (s *YahooConfiguration) refreshCrumb() error {
 	return nil
 }
 
-func (s *YahooConfiguration) Call(path string, form *form.Values, ctx *context.Context, v interface{}) error {
+// Call is the Backend.Call implementation for invoking market data APIs, using the Yahoo specialization
+func (s *yahooConfiguration) Call(path string, form *form.Values, ctx *context.Context, v interface{}) error {
 	// Check if the cookies have expired.
 	if s.expiry.Before(time.Now()) {
 		// Refresh the cookies and crumb.
@@ -286,12 +288,12 @@ func (s *YahooConfiguration) Call(path string, form *form.Values, ctx *context.C
 		path += "?" + form.Encode()
 	}
 
-	req, err := s.NewRequest("GET", path, ctx)
+	req, err := s.newRequest("GET", path, ctx)
 	if err != nil {
 		return err
 	}
 
-	if err := s.Do(req, v); err != nil {
+	if err := s.do(req, v); err != nil {
 		return err
 	}
 
@@ -305,20 +307,20 @@ func (s *BackendConfiguration) Call(path string, form *form.Values, ctx *context
 		path += "?" + form.Encode()
 	}
 
-	req, err := s.NewRequest("GET", path, ctx)
+	req, err := s.newRequest("GET", path, ctx)
 	if err != nil {
 		return err
 	}
 
-	if err := s.Do(req, v); err != nil {
+	if err := s.do(req, v); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *YahooConfiguration) NewRequest(method, path string, ctx *context.Context) (*http.Request, error) {
-	req, err := s.BackendConfiguration.NewRequest(method, path, ctx)
+func (s *yahooConfiguration) newRequest(method, path string, ctx *context.Context) (*http.Request, error) {
+	req, err := s.BackendConfiguration.newRequest(method, path, ctx)
 
 	if err != nil {
 		return nil, err
@@ -343,8 +345,7 @@ func (s *YahooConfiguration) NewRequest(method, path string, ctx *context.Contex
 	return req, nil
 }
 
-// NewRequest is used by Call to generate an http.Request.
-func (s *BackendConfiguration) NewRequest(method, path string, ctx *context.Context) (*http.Request, error) {
+func (s *BackendConfiguration) newRequest(method, path string, ctx *context.Context) (*http.Request, error) {
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
@@ -365,10 +366,10 @@ func (s *BackendConfiguration) NewRequest(method, path string, ctx *context.Cont
 	return req, nil
 }
 
-// Do is used by Call to execute an API request and parse the response. It uses
+// do is used by Call to execute an API request and parse the response. It uses
 // the backend's HTTP client to execute the request and unmarshals the response
 // into v. It also handles unmarshaling errors returned by the API.
-func (s *BackendConfiguration) Do(req *http.Request, v interface{}) error {
+func (s *BackendConfiguration) do(req *http.Request, v interface{}) error {
 	if LogLevel > 1 {
 		Logger.Printf("Requesting %v %v%v\n", req.Method, req.URL.Host, req.URL.Path)
 	}
