@@ -193,8 +193,8 @@ func fetchCookies() (string, time.Time, error) {
 	defer response.Body.Close()
 
 	var result string
-	// create a variable expiry that is one year in the future
-	var expiry = time.Now().AddDate(1, 0, 0)
+	// create a variable expiry that is ten years in the future
+	var expiry = time.Now().AddDate(10, 0, 0)
 
 	for _, cookie := range response.Cookies() {
 		var unixTime = cookie.Expires.Unix()
