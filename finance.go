@@ -3,7 +3,7 @@ package finance
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -28,7 +28,7 @@ const (
 	// YFinBackend is a constant representing the yahoo service backend.
 	YFinBackend SupportedBackend = "yahoo"
 	// YFinURL is the URL of the yahoo service backend.
-	YFinURL string = "https://query2.finance.yahoo.com"
+	YFinURL string = "https://query1.finance.yahoo.com"
 	// BATSBackend is a constant representing the uploads service backend.
 	BATSBackend SupportedBackend = "bats"
 	// BATSURL is the URL of the uploads service backend.
@@ -38,8 +38,12 @@ const (
 	// ------------------
 
 	defaultHTTPTimeout = 80 * time.Second
-	yFinURL            = "https://query2.finance.yahoo.com"
+	yFinURL            = "https://query1.finance.yahoo.com"
 	batsURL            = ""
+
+	crumbURL  = yFinURL + "/v1/test/getcrumb"
+	cookieURL = "https://login.yahoo.com"
+	userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0"
 )
 
 var (
@@ -78,6 +82,13 @@ type BackendConfiguration struct {
 	HTTPClient *http.Client
 }
 
+type YahooConfiguration struct {
+	BackendConfiguration
+	expiry  time.Time
+	cookies string
+	crumb   string
+}
+
 // Backend is an interface for making calls against an api service.
 // This interface exists to enable mocking for during testing if needed.
 type Backend interface {
@@ -95,8 +106,11 @@ func SetHTTPClient(client *http.Client) {
 // should only need to use this for testing purposes or on App Engine.
 func NewBackends(httpClient *http.Client) *Backends {
 	return &Backends{
-		YFin: &BackendConfiguration{
-			YFinBackend, YFinURL, httpClient,
+		YFin: &YahooConfiguration{
+			BackendConfiguration{YFinBackend, YFinURL, httpClient},
+			time.Time{},
+			"",
+			"",
 		},
 		Bats: &BackendConfiguration{
 			BATSBackend, BATSURL, httpClient,
@@ -116,7 +130,12 @@ func GetBackend(backend SupportedBackend) Backend {
 		}
 		backends.mu.Lock()
 		defer backends.mu.Unlock()
-		backends.YFin = &BackendConfiguration{backend, yFinURL, httpClient}
+		backends.YFin = &YahooConfiguration{
+			BackendConfiguration{YFinBackend, YFinURL, httpClient},
+			time.Time{},
+			"",
+			"",
+		}
 		return backends.YFin
 	case BATSBackend:
 		backends.mu.RLock()
@@ -144,6 +163,141 @@ func SetBackend(backend SupportedBackend, b Backend) {
 	}
 }
 
+func fetchCookies() (error, string, time.Time) {
+	client := http.Client{}
+	request, err := http.NewRequest("GET", cookieURL, nil)
+	if err != nil {
+		return err, "", time.Time{}
+	}
+
+	request.Header = http.Header{
+		"Accept":                   {"*/*"},
+		"Accept-Encoding":          {"gzip, deflate, br"},
+		"Accept-Language":          {"en-US,en;q=0.5"},
+		"Connection":               {"keep-alive"},
+		"Host":                     {"login.yahoo.com"},
+		"Sec-Fetch-Dest":           {"document"},
+		"Sec-Fetch-Mode":           {"navigate"},
+		"Sec-Fetch-Site":           {"none"},
+		"Sec-Fetch-User":           {"?1"},
+		"TE":                       {"trailers"},
+		"Update-Insecure-Requests": {"1"},
+		"User-Agent":               {userAgent},
+	}
+
+	response, err := client.Do(request)
+	if err != nil {
+		return err, "", time.Time{}
+	}
+	defer response.Body.Close()
+
+	var result string
+	// create a variable expiry that is one year in the future
+	var expiry = time.Now().AddDate(1, 0, 0)
+
+	for _, cookie := range response.Cookies() {
+		var unixTime = cookie.Expires.Unix()
+
+		// Skip invalid cookies
+		if unixTime <= 0 {
+			continue
+		}
+
+		if cookie.Name != "AS" {
+			result += cookie.Name + "=" + cookie.Value + "; "
+			// set expiry to the latest cookie expiry if smaller than the current expiry
+			if cookie.Expires.Before(expiry) {
+				expiry = cookie.Expires
+			}
+		}
+	}
+	result = strings.TrimSuffix(result, "; ")
+	return nil, result, expiry
+}
+
+func fetchCrumb(cookies string) (error, string) {
+	client := http.Client{}
+	request, err := http.NewRequest("GET", crumbURL, nil)
+	if err != nil {
+		return err, ""
+	}
+
+	request.Header = http.Header{
+		"Accept":          {"*/*"},
+		"Accept-Encoding": {"gzip, deflate, br"},
+		"Accept-Language": {"en-US,en;q=0.5"},
+		"Connection":      {"keep-alive"},
+		"Content-Type":    {"text/plain"},
+		"Cookie":          {cookies},
+		"Host":            {"query1.finance.yahoo.com"},
+		"Sec-Fetch-Dest":  {"empty"},
+		"Sec-Fetch-Mode":  {"cors"},
+		"Sec-Fetch-Site":  {"same-site"},
+		"TE":              {"trailers"},
+		"User-Agent":      {userAgent},
+	}
+
+	response, err := client.Do(request)
+	if err != nil {
+		return err, ""
+	}
+	defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return err, ""
+	}
+
+	return nil, string(body[:])
+}
+
+func (s *YahooConfiguration) refreshCrumb() error {
+	err, cookies, expiry := fetchCookies()
+	if err != nil {
+		return err
+	}
+
+	err, crumb := fetchCrumb(cookies)
+	if err != nil {
+		return err
+	}
+
+	s.crumb = crumb
+	s.expiry = expiry
+	s.cookies = cookies
+	return nil
+}
+
+func (s *YahooConfiguration) Call(path string, form *form.Values, ctx *context.Context, v interface{}) error {
+	// Check if the cookies have expired.
+	if s.expiry.Before(time.Now()) {
+		// Refresh the cookies and crumb.
+		err := s.refreshCrumb()
+		if err != nil {
+			return err
+		}
+	}
+
+	if s.crumb != "" {
+		form.Add("crumb", s.crumb)
+	}
+
+	if form != nil && !form.Empty() {
+		path += "?" + form.Encode()
+	}
+
+	req, err := s.NewRequest("GET", path, ctx)
+	if err != nil {
+		return err
+	}
+
+	if err := s.Do(req, v); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Call is the Backend.Call implementation for invoking market data APIs.
 func (s *BackendConfiguration) Call(path string, form *form.Values, ctx *context.Context, v interface{}) error {
 
@@ -161,6 +315,32 @@ func (s *BackendConfiguration) Call(path string, form *form.Values, ctx *context
 	}
 
 	return nil
+}
+
+func (s *YahooConfiguration) NewRequest(method, path string, ctx *context.Context) (*http.Request, error) {
+	req, err := s.BackendConfiguration.NewRequest(method, path, ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header = http.Header{
+		"Accept":          {"*/*"},
+		"Accept-Language": {"en-US,en;q=0.5"},
+		"Connection":      {"keep-alive"},
+		"Content-Type":    {"application/json"},
+		"Cookie":          {s.cookies},
+		"Host":            {"query1.finance.yahoo.com"},
+		"Origin":          {"https://finance.yahoo.com"},
+		"Referer":         {"https://finance.yahoo.com"},
+		"Sec-Fetch-Dest":  {"empty"},
+		"Sec-Fetch-Mode":  {"cors"},
+		"Sec-Fetch-Site":  {"same-site"},
+		"TE":              {"trailers"},
+		"User-Agent":      {userAgent},
+	}
+
+	return req, nil
 }
 
 // NewRequest is used by Call to generate an http.Request.
@@ -209,7 +389,7 @@ func (s *BackendConfiguration) Do(req *http.Request, v interface{}) error {
 	}
 	defer res.Body.Close()
 
-	resBody, err := ioutil.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		if LogLevel > 0 {
 			Logger.Printf("Cannot parse response: %v\n", err)

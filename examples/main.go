@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/piquette/finance-go/options"
 )
 
@@ -10,7 +9,7 @@ import (
 // and can be used to verify behavior.
 func main() {
 
-	iter := options.GetStraddle("TWTR")
+	iter := options.GetStraddle("AAPL")
 
 	fmt.Println(iter.Meta())
 
