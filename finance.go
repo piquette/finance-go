@@ -197,18 +197,18 @@ func fetchCookies() (string, time.Time, error) {
 	var expiry = time.Now().AddDate(10, 0, 0)
 
 	for _, cookie := range response.Cookies() {
-		var unixTime = cookie.Expires.Unix()
 
-		// Skip invalid cookies
-		if unixTime <= 0 {
+		if cookie.MaxAge <= 0 {
 			continue
 		}
+
+		cookieExpiry := time.Now().Add(time.Duration(cookie.MaxAge) * time.Second)
 
 		if cookie.Name != "AS" {
 			result += cookie.Name + "=" + cookie.Value + "; "
 			// set expiry to the latest cookie expiry if smaller than the current expiry
-			if cookie.Expires.Before(expiry) {
-				expiry = cookie.Expires
+			if cookie.Expires.Before(cookieExpiry) {
+				expiry = cookieExpiry
 			}
 		}
 	}
