@@ -79,5 +79,5 @@ func TestGetBadQuote(t *testing.T) {
 
 	q, err := Get("TEST")
 	assert.Nil(t, q)
-	assert.Nil(t, err)
+	assert.Equal(t, "Can't find quote for symbol: TEST", err.Error())
 }

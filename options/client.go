@@ -87,7 +87,7 @@ func (c Client) GetStraddleP(params *Params) *StraddleIter {
 	return &StraddleIter{iter.New(body, func(b *form.Values) (meta interface{}, values []interface{}, err error) {
 
 		resp := response{}
-		err = c.B.Call("v6/finance/options/"+params.UnderlyingSymbol, body, params.Context, &resp)
+		err = c.B.Call("/v7/finance/options/"+params.UnderlyingSymbol, body, params.Context, &resp)
 		if err != nil {
 			return
 		}
